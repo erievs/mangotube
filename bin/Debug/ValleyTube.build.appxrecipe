@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>DESKTOP-66NPKKN</Machine>
+    <WindowsUser>Nicholas Bryan Brook</WindowsUser>
+    <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
+    <SolutionConfiguration>Debug|AnyCPU</SolutionConfiguration>
+    <PackageArchitecture>neutral</PackageArchitecture>
+    <PackageIdentityName>af7cce9f-1383-4bd3-8082-368b21c74c08</PackageIdentityName>
+    <IntermediateOutputPath>C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\ValleyTube.exe">
+      <PackagePath>ValleyTube.exe</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\packages\Newtonsoft.Json.8.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll">
+      <PackagePath>Newtonsoft.Json.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Logo.scale-240.png">
+      <PackagePath>Assets\Logo.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\placeholder.png">
+      <PackagePath>Assets\placeholder.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\SmallLogo.scale-240.png">
+      <PackagePath>Assets\SmallLogo.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\SplashScreen.scale-240.png">
+      <PackagePath>Assets\SplashScreen.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Square71x71Logo.scale-240.png">
+      <PackagePath>Assets\Square71x71Logo.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\StoreLogo.scale-240.png">
+      <PackagePath>Assets\StoreLogo.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\WideLogo.scale-240.png">
+      <PackagePath>Assets\WideLogo.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\App.xbf">
+      <PackagePath>App.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\MainPage.xbf">
+      <PackagePath>MainPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\VideoPage.xbf">
+      <PackagePath>VideoPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\ValleyTube.xr.xml">
+      <PackagePath>ValleyTube.xr.xml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
