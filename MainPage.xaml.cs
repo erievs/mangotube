@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -70,7 +70,6 @@ namespace ValleyTube
             }
         }
 
-
         private async void Search(string query, int page = 1)
         {
             string apiUrl = string.Format("https://inv.nadeko.net/api/v1/search?q={0}&page={1}&sort=relevance",
@@ -131,8 +130,6 @@ namespace ValleyTube
             }
         }
 
-
-
         private void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Pivot pivot = sender as Pivot;
@@ -181,7 +178,7 @@ namespace ValleyTube
             if (video != null)
             {
                 System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
-                Frame.Navigate(typeof(VideoPage), video.VideoId); // Assuming VideoPage expects an ID parameter
+                Frame.Navigate(typeof(VideoPage), video.VideoId); 
             }
         }
 
@@ -200,15 +197,12 @@ namespace ValleyTube
             }
         }
 
-
-
     }
 
     public class SearchResult
     {
         public List<VideoResult> Results { get; set; }
     }
-
 
     public class VideoDetail
     {
