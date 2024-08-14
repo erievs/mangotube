@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="af7cce9f-1383-4bd3-8082-368b21c74c08" Publisher="CN=Nicholas Bryan Brook" Version="1.0.0.0" />
+  <Identity Name="af7cce9f-1383-4bd3-8082-368b21c74c08" Publisher="CN=Nicholas Bryan Brook" Version="1.0.0.4" />
   <mp:PhoneIdentity PhoneProductId="af7cce9f-1383-4bd3-8082-368b21c74c08" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>ValleyTube</DisplayName>
     <PublisherDisplayName>Nicholas Bryan Brook</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <Logo>Assets\512px-Hapus_Mango(4).jpg</Logo>
   </Properties>
   <Prerequisites>
     <OSMinVersion>6.3.1</OSMinVersion>
@@ -16,10 +16,10 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ValleyTube.App">
-      <m3:VisualElements DisplayName="MangoTube" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="ValleyTube" ForegroundText="light" BackgroundColor="transparent">
-        <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
+      <m3:VisualElements DisplayName="MangoTube" Square150x150Logo="Assets\512px-Hapus_Mango(5).jpg" Square44x44Logo="Assets\512px-Hapus_Mango(2).jpg" Description="ValleyTube" ForegroundText="light" BackgroundColor="transparent">
+        <m3:DefaultTile Square71x71Logo="Assets\512px-Hapus_Mango(1).jpg">
         </m3:DefaultTile>
-        <m3:SplashScreen Image="Assets\SplashScreen.png" />
+        <m3:SplashScreen Image="Assets\512px-Hapus_Mango(7).jpg" />
       </m3:VisualElements>
     </Application>
   </Applications>

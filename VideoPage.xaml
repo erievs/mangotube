@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ValleyTube"
+    xmlns:smooth="using:WinJSContrib.SmoothStreaming"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -14,37 +15,36 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-
         <Button x:Name="BackButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,25" Click="BackButton_Click" Background="Transparent" BorderBrush="Gray" BorderThickness="2">
-            <Button.Content>
                 <SymbolIcon Symbol="Back"/>
-            </Button.Content>
         </Button>
 
-
         <StackPanel Margin="10" Grid.Row="0">
-
             <TextBlock x:Name="VideoTitle" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,40,0,10"/>
 
-            <MediaElement x:Name="VideoPlayer"
-              AutoPlay="True"
-              Stretch="UniformToFill"
-              AreTransportControlsEnabled="True"
-              Width="400"
-              Height="220"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Top"/>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                <MediaElement x:Name="VideoPlayer"
+                  AutoPlay="True"
+                  Stretch="UniformToFill"
+                  AreTransportControlsEnabled="True"
+                  Width="400"
+                  Height="260"
+                  CurrentStateChanged="VideoPlayer_CurrentStateChanged"
+                  MediaEnded="MediaElement_MediaEnded"
+                  MediaOpened="VideoPlayer_MediaOpened" />
 
-
-
-
-
-
+                <MediaElement x:Name="AudioPlayer"
+                  AutoPlay="True"
+                  Width="0"
+                  Height="0"
+                  Volume="1.0"
+                  MediaEnded="MediaElement_MediaEnded"
+                  MediaOpened="AudioPlayer_MediaOpened" />
+            </StackPanel>
+            
         </StackPanel>
 
-
         <Pivot Margin="10" Grid.Row="1">
-
             <PivotItem Header="Description">
                 <ScrollViewer>
                     <TextBlock x:Name="DescriptionTextBlock"
@@ -54,7 +54,6 @@
                                Margin="10"/>
                 </ScrollViewer>
             </PivotItem>
-
 
             <PivotItem Header="Comments">
                 <ScrollViewer x:Name="CommentsScrollViewer">
@@ -74,16 +73,13 @@
                 </ScrollViewer>
             </PivotItem>
 
-
-
-
             <PivotItem Header="Related Videos">
                 <ScrollViewer>
                     <ListView x:Name="RelatedVideosListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="Button_Click_2">
+                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="Button_Click_3">
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                     </Button>
                                     <StackPanel>
@@ -98,7 +94,6 @@
                     </ListView>
                 </ScrollViewer>
             </PivotItem>
-            
         </Pivot>
     </Grid>
 </Page>
