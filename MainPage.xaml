@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Pivot Title="ValleyTube" SelectionChanged="Pivot_SelectionChanged">
+        <Pivot Title="MangoTube" SelectionChanged="Pivot_SelectionChanged">
             <PivotItem Header="Trending">
                 <ListView x:Name="TrendsListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>

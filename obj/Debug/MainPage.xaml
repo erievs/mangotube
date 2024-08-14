@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Pivot x:ConnectionId='1' Title="ValleyTube"                                          >
+        <Pivot x:ConnectionId='1' Title="MangoTube"                                          >
             <PivotItem Header="Trending">
                 <ListView x:ConnectionId='12' x:Name="TrendsListView"                                     >
                     <ListView.ItemTemplate>
