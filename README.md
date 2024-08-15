@@ -19,3 +19,5 @@ Add playlists
 Tweak the UI
 
 Fix certain videos not playing
+
+Add double tap player to skip video
