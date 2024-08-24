@@ -6,7 +6,7 @@ FYI: The javascript isn't used for, I by mistake installed a package and I forgo
 
 # Credits
 
-poplol
+poplol - created the logo
 
 # Todo
 
