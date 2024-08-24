@@ -5,7 +5,7 @@
   <Properties>
     <DisplayName>ValleyTube</DisplayName>
     <PublisherDisplayName>Erie Valley Software</PublisherDisplayName>
-    <Logo>Assets\512px-Hapus_Mango(4).jpg</Logo>
+    <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>
     <OSMinVersion>6.3.1</OSMinVersion>
@@ -16,10 +16,11 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ValleyTube.App">
-      <m3:VisualElements DisplayName="MangoTube" Square150x150Logo="Assets\512px-Hapus_Mango(5).jpg" Square44x44Logo="Assets\512px-Hapus_Mango(2).jpg" Description="ValleyTube" ForegroundText="light" BackgroundColor="transparent">
-        <m3:DefaultTile Square71x71Logo="Assets\512px-Hapus_Mango(1).jpg">
+      <m3:VisualElements DisplayName="MangoTube" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="ValleyTube" ForegroundText="light" BackgroundColor="transparent">
+        <m3:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png" />
+        <m3:DefaultTile Square71x71Logo="Assets\Square71x71Logo.png" Wide310x150Logo="Assets\Wide310x150Logo.png">
         </m3:DefaultTile>
-        <m3:SplashScreen Image="Assets\512px-Hapus_Mango(7).jpg" />
+        <m3:SplashScreen Image="Assets\SplashScreen.png" />
       </m3:VisualElements>
     </Application>
   </Applications>

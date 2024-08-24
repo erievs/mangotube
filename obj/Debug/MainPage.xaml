@@ -9,13 +9,89 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Pivot x:ConnectionId='1' Title="MangoTube"                                          >
-            <PivotItem Header="Trending">
-                <ListView x:ConnectionId='12' x:Name="TrendsListView"                                     >
+        <Pivot x:ConnectionId='1' Name="BobIsYourUncle" Title="MANGOTUBE"                                          >
+            <PivotItem Header="trending">
+                <ListView x:ConnectionId='21' x:Name="TrendingListView"                                     >
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <Button x:ConnectionId='13' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
+                                <Button x:ConnectionId='22' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
+                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                </Button>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="popular">
+                <ListView x:ConnectionId='19' x:Name="PopularListView"                                     >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Button x:ConnectionId='20' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
+                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                </Button>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="gaming">
+                <ListView x:ConnectionId='17' x:Name="GamingListView"                                     >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Button x:ConnectionId='18' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
+                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                </Button>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="music">
+                <ListView x:ConnectionId='15' x:Name="MusicListView"                                     >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Button x:ConnectionId='16' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
+                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                </Button>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="movies">
+                <ListView x:ConnectionId='13' x:Name="MoviesListView"                                     >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Button x:ConnectionId='14' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
                                     <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                 </Button>
                                 <StackPanel>
@@ -30,13 +106,14 @@
                 </ListView>
             </PivotItem>
 
-            <PivotItem Header="Gaming">
-                <ListView x:ConnectionId='10' x:Name="GamingListView"                                     >
+            
+            <PivotItem Header="history">
+                <ListView x:Name="HistoryListView">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <Button x:ConnectionId='11' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                <Button x:ConnectionId='12' Background="Transparent" BorderBrush="Transparent" Padding="0"                           >
+                                    <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -49,45 +126,8 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
-            <PivotItem Header="Music">
-                <ListView x:ConnectionId='8' x:Name="MusicListView"                                     >
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <Button x:ConnectionId='9' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                </Button>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </PivotItem>
-            <PivotItem Header="Movies">
-                <ListView x:ConnectionId='6' x:Name="MoviesListView"                                     >
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <Button x:ConnectionId='7' Background="Transparent" BorderBrush="Transparent" Padding="0"                          >
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                </Button>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </PivotItem>
-            <PivotItem Header="Search">
+
+            <PivotItem Header="search">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -95,13 +135,13 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox x:ConnectionId='2' x:Name="SearchBox" PlaceholderText="Search..." Margin="10"                                     Grid.Row="0"/>
+                    <TextBox x:ConnectionId='8' x:Name="SearchBox" PlaceholderText="Search..." Margin="10"                                     Grid.Row="0"/>
 
-                    <ListView x:ConnectionId='3' x:Name="SearchListView" Margin="10" Grid.Row="1"                                     >
+                    <ListView x:ConnectionId='9' x:Name="SearchListView" Margin="10" Grid.Row="1"                                     >
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Button x:ConnectionId='5' Background="Transparent" BorderBrush="Transparent" Padding="0"                           >
+                                    <Button x:ConnectionId='11' Background="Transparent" BorderBrush="Transparent" Padding="0"                           >
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                     </Button>
                                     <StackPanel>
@@ -115,10 +155,116 @@
                         </ListView.ItemTemplate>
                     </ListView>
 
-                    <Button x:ConnectionId='4' x:Name="LoadMoreButton" Content="Load More" Margin="10" VerticalAlignment="Bottom" Grid.Row="2"                             />
+                    <Button x:ConnectionId='10' x:Name="LoadMoreButton" Content="Load More" Margin="10" VerticalAlignment="Bottom" Grid.Row="2"                             />
                 </Grid>
             </PivotItem>
+
+
+            <PivotItem Header="subscriptions">
+                <ListView x:ConnectionId='6' x:Name="SubscriptionsListView"                                     >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Button x:ConnectionId='7' Background="Transparent" BorderBrush="Transparent" Padding="0"                           >
+                                    <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                </Button>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+
+            <PivotItem Header="settings">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="Settings" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <TextBlock Text="Video Quality" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                                <ComboBox x:ConnectionId='5' x:Name="QualityComboBox"
+                                                                                 
+                              Margin="20,0,0,0"
+                              Width="150">
+                                    <ComboBoxItem Content="144p" Tag="144"/>
+                                    <ComboBoxItem Content="240p" Tag="240"/>
+                                    <ComboBoxItem Content="360p Direct" Tag="360p-direct" IsSelected="True"/>
+                                    <ComboBoxItem Content="360p" Tag="360"/>
+                                    <ComboBoxItem Content="480p" Tag="480"/>
+                                    <ComboBoxItem Content="720p" Tag="720"/>
+                                    <ComboBoxItem Content="1080p" Tag="1080"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <TextBlock Text="Select the preferred video quality. The player will attempt to use the selected quality."
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <!-- Autoplay Toggle -->
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <TextBlock Text="Autoplay Next Video" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                                <ToggleSwitch x:ConnectionId='4' x:Name="AutoplayToggleSwitch" 
+                                                                         
+                                  Margin="20,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="Enable this option to automatically play the next video when the current one finishes."
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <!-- Import Subscriptions -->
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:ConnectionId='3' x:Name="ImportSubscriptionsButton" 
+                        Content="Import Subscriptions" 
+                        FontSize="20" 
+                        Margin="0,10,0,0"
+                                                               />
+                            <TextBlock Text="Click this button to import subscriptions from a CSV file. This will add new subscriptions based on the CSV file's content."
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <!-- Clear Subscriptions -->
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:ConnectionId='2' x:Name="ClearSubcriptions" 
+                        Content="Clear Subscriptions" 
+                        FontSize="20" 
+                        Margin="0,10,0,0"
+                                                       />
+                            <TextBlock Text="Click this button to clear subscriptions."
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
         </Pivot>
+        
+        <TextBlock x:Name="StatusMessageTextBlock" 
+               Text="" 
+               Foreground="White" 
+               FontSize="16" 
+               VerticalAlignment="Bottom" 
+               HorizontalAlignment="Center" 
+               Margin="0,20,0,0" 
+               Visibility="Collapsed"/>
+        
     </Grid>
 </Page>
 

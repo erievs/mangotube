@@ -1,3 +1,1 @@
 Scale=240
-Scale=140
-Scale=100

@@ -23,7 +23,6 @@ C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\b
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\ValleyTube.build.appxrecipe
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ValleyTube.csprojResolveAssemblyReference.cache
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ValleyTube.exe
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ValleyTube.pdb
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ValleyTube.csproj.GenerateResource.Cache
@@ -39,3 +38,4 @@ C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\o
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\qualifiers.txt.intermediate
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\MultipleQualifiersPerDimensionFound.txt
 C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ProjectArchitectures.txt
+C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\Debug\ValleyTube.csprojResolveAssemblyReference.cache

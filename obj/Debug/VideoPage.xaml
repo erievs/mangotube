@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ValleyTube"
+    xmlns:smooth="using:WinJSContrib.SmoothStreaming"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -14,47 +15,79 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-
         <Button x:ConnectionId='1' x:Name="BackButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,25"                          Background="Transparent" BorderBrush="Gray" BorderThickness="2">
-            <Button.Content>
-                <SymbolIcon Symbol="Back"/>
-            </Button.Content>
+            <SymbolIcon Symbol="Back"/>
         </Button>
 
-
         <StackPanel Margin="10" Grid.Row="0">
-
             <TextBlock x:Name="VideoTitle" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,40,0,10"/>
 
-            <MediaElement x:Name="VideoPlayer"
-              AutoPlay="True"
-              Stretch="UniformToFill"
-              AreTransportControlsEnabled="True"
-              Width="400"
-              Height="220"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Top"/>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                <MediaElement x:ConnectionId='5' x:Name="VideoPlayer"
+                  AutoPlay="True"
+                  Stretch="UniformToFill"
+                  AreTransportControlsEnabled="True"
+                  Width="455"
+                  Height="300"
+                                                                       
+                                                      
+                                                       
+                                                         
+                              />
 
-
-
-
-
+                <MediaElement x:ConnectionId='6' x:Name="AudioPlayer"
+                  AutoPlay="True"
+                  Width="0"
+                  Height="0"
+                  Volume="1.0"
+                                                      
+                                                        />
+            </StackPanel>
 
         </StackPanel>
 
-
         <Pivot Margin="10" Grid.Row="1">
-
             <PivotItem Header="Description">
                 <ScrollViewer>
-                    <TextBlock x:Name="DescriptionTextBlock"
+                    <StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center">
+
+                            <Button x:ConnectionId='4' x:Name="SubscribeButton"
+                            Content="Subscribe"
+                                                         
+                            HorizontalAlignment="Left"
+                            Margin="5"
+                            Background="#C8102E" 
+                            Foreground="White"
+                            VerticalAlignment="Center"/>
+
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock x:Name="AuthorTextBlock"
+                                       
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Text="" 
+                                   Margin="0,0,5,0"/>
+
+                                <TextBlock x:Name="DateTextBlock"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Text=""/>
+
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock x:Name="DescriptionTextBlock"
                                TextWrapping="Wrap"
                                FontSize="16"
                                Foreground="White"
                                Margin="10"/>
+
+                    </StackPanel>
                 </ScrollViewer>
             </PivotItem>
-
 
             <PivotItem Header="Comments">
                 <ScrollViewer x:Name="CommentsScrollViewer">
@@ -73,9 +106,6 @@
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
-
-
-
 
             <PivotItem Header="Related Videos">
                 <ScrollViewer>
@@ -98,7 +128,6 @@
                     </ListView>
                 </ScrollViewer>
             </PivotItem>
-            
         </Pivot>
     </Grid>
 </Page>
