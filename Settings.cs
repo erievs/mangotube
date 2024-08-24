@@ -10,7 +10,7 @@ namespace ValleyTube
     {
         private static bool _isDash = false;
 
-        public const int MaxHistorySize = 50;
+        public const int MaxHistorySize = 52;
 
         public static bool isDash
         {
