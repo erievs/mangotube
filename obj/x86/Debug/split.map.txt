@@ -1,0 +1,17 @@
+﻿[ResourceMetadata]
+"ResourceDimensions"		"scale-240"
+"ResourceDimensions"		"language-en-us"
+
+[Files]
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\split.pri"			"resources.pri"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\VideoPage.xbf"			"VideoPage.xbf"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\ValleyTube.xr.xml"			"ValleyTube.xr.xml"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\MainPage.xbf"			"MainPage.xbf"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\WideLogo.scale-240.png"			"Assets\WideLogo.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\StoreLogo.scale-240.png"			"Assets\StoreLogo.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\Square71x71Logo.scale-240.png"			"Assets\Square71x71Logo.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\SplashScreen.scale-240.png"			"Assets\SplashScreen.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\SmallLogo.scale-240.png"			"Assets\SmallLogo.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\placeholder.png"			"Assets\placeholder.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\Assets\Logo.scale-240.png"			"Assets\Logo.scale-240.png"
+"C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\x86\Debug\PackageLayout\App.xbf"			"App.xbf"

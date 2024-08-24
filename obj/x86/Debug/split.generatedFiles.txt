@@ -1,0 +1,6 @@
+obj\x86\Debug\split.pri
+obj\x86\Debug\split.map.txt
+obj\x86\Debug\split.scale-100.pri
+obj\x86\Debug\split.scale-100.map.txt
+obj\x86\Debug\split.scale-140.pri
+obj\x86\Debug\split.scale-140.map.txt

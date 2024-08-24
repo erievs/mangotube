@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>DESKTOP-66NPKKN</Machine>
+    <WindowsUser>Nicholas Bryan Brook</WindowsUser>
+    <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
+    <SolutionConfiguration>Debug|ARM</SolutionConfiguration>
+    <PackageArchitecture>arm</PackageArchitecture>
+    <PackageIdentityName>af7cce9f-1383-4bd3-8082-368b21c74c08</PackageIdentityName>
+    <IntermediateOutputPath>C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\obj\ARM\Debug\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\ValleyTube.exe">
+      <PackagePath>ValleyTube.exe</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\packages\Newtonsoft.Json.8.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll">
+      <PackagePath>Newtonsoft.Json.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\placeholder.png">
+      <PackagePath>Assets\placeholder.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%2810%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%2810%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%2811%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%2811%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%2812%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%2812%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%2813%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%2813%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%2814%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%2814%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%282%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%282%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%283%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%283%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%284%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%284%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%285%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%285%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%286%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%286%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%287%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%287%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%288%29.scale-240.png">
+      <PackagePath>Assets\Untitled59_20240815235856%288%29.scale-240.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Assets\Untitled59_20240815235856%289%29.png">
+      <PackagePath>Assets\Untitled59_20240815235856%289%29.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\css\winjscontrib\mcnext.ui.css">
+      <PackagePath>css\winjscontrib\mcnext.ui.css</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\jquery-2.0.0.intellisense.js">
+      <PackagePath>Scripts\jquery-2.0.0.intellisense.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\jquery-2.0.0.js">
+      <PackagePath>Scripts\jquery-2.0.0.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\jquery-2.0.0.min.js">
+      <PackagePath>Scripts\jquery-2.0.0.min.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\jquery.mcnext.WinJS.js">
+      <PackagePath>Scripts\winjscontrib\jquery.mcnext.WinJS.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\mcnext.ui.animation.js">
+      <PackagePath>Scripts\winjscontrib\mcnext.ui.animation.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\mcnext.ui.bindings.js">
+      <PackagePath>Scripts\winjscontrib\mcnext.ui.bindings.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\mcnext.ui.boilerplatecontrol.js">
+      <PackagePath>Scripts\winjscontrib\mcnext.ui.boilerplatecontrol.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\mcnext.ui.twowaybindings.js">
+      <PackagePath>Scripts\winjscontrib\mcnext.ui.twowaybindings.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\Scripts\winjscontrib\mcnext.ui.utils.js">
+      <PackagePath>Scripts\winjscontrib\mcnext.ui.utils.js</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\App.xbf">
+      <PackagePath>App.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\MainPage.xbf">
+      <PackagePath>MainPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\VideoPage.xbf">
+      <PackagePath>VideoPage.xbf</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\ValleyTube.xr.xml">
+      <PackagePath>ValleyTube.xr.xml</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Nicholas Bryan Brook\Documents\Visual Studio 2013\Projects\ValleyTube\bin\ARM\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
