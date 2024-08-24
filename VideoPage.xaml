@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <Button x:Name="BackButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,25" Click="BackButton_Click" Background="Transparent" BorderBrush="Gray" BorderThickness="2">
-                <SymbolIcon Symbol="Back"/>
+            <SymbolIcon Symbol="Back"/>
         </Button>
 
         <StackPanel Margin="10" Grid.Row="0">
@@ -27,11 +27,13 @@
                   AutoPlay="True"
                   Stretch="UniformToFill"
                   AreTransportControlsEnabled="True"
-                  Width="400"
-                  Height="260"
+                  Width="455"
+                  Height="300"
                   CurrentStateChanged="VideoPlayer_CurrentStateChanged"
                   MediaEnded="MediaElement_MediaEnded"
-                  MediaOpened="VideoPlayer_MediaOpened" />
+                  MediaOpened="VideoPlayer_MediaOpened"
+                  DoubleTapped="VideoPlayer_DoubleTapped"
+                              />
 
                 <MediaElement x:Name="AudioPlayer"
                   AutoPlay="True"
@@ -41,17 +43,49 @@
                   MediaEnded="MediaElement_MediaEnded"
                   MediaOpened="AudioPlayer_MediaOpened" />
             </StackPanel>
-            
+
         </StackPanel>
 
         <Pivot Margin="10" Grid.Row="1">
             <PivotItem Header="Description">
                 <ScrollViewer>
-                    <TextBlock x:Name="DescriptionTextBlock"
+                    <StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center">
+
+                            <Button x:Name="SubscribeButton"
+                            Content="Subscribe"
+                            Click="SubscribeButton_Click"
+                            HorizontalAlignment="Left"
+                            Margin="5"
+                            Background="#C8102E" 
+                            Foreground="White"
+                            VerticalAlignment="Center"/>
+
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock x:Name="AuthorTextBlock"
+                                       
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Text="" 
+                                   Margin="0,0,5,0"/>
+
+                                <TextBlock x:Name="DateTextBlock"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Text=""/>
+
+                            </StackPanel>
+                        </StackPanel>
+
+                        <TextBlock x:Name="DescriptionTextBlock"
                                TextWrapping="Wrap"
                                FontSize="16"
                                Foreground="White"
                                Margin="10"/>
+
+                    </StackPanel>
                 </ScrollViewer>
             </PivotItem>
 

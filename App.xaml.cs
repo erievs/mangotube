@@ -113,6 +113,26 @@ namespace ValleyTube
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
         }
 
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+
+            var fileArgs = args as FileOpenPickerContinuationEventArgs;
+            if (fileArgs != null && fileArgs.Files.Count > 0)
+            {
+                var file = fileArgs.Files[0];
+                var rootFrame = Window.Current.Content as Frame;
+                var mainPage = rootFrame.Content as MainPage;
+
+                if (mainPage != null)
+                {
+                    SubscriptionManager.ImportSubscriptionsFromCsv(file);
+                }
+            }
+        }
+
+
         /// <summary>
         /// Invoked when application execution is being suspended.  Application state is saved
         /// without knowing whether the application will be terminated or resumed with the contents
