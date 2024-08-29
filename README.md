@@ -2,7 +2,7 @@
 
 It is programmed like dogshit but it works.
 
-FYI: The javascript isn't used for, I by mistake installed a package and I forgot to get rid of it.
+New update coming probbaly friday or thursday or this weekend! 
 
 # Credits
 
