@@ -8,10 +8,6 @@ New update coming probbaly friday or thursday or this weekend!
 
 poplol - created the logo
 
-# what i am working on (expect a update sep 1st or 2nd)
-
-Channels
-
 # Todo
 
 Move all invidious urls to a class called Urls to make url changes easier. 
