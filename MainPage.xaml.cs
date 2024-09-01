@@ -23,10 +23,13 @@ namespace ValleyTube
         public MainPage()
         {
             this.InitializeComponent();
+            this.DataContext = typeof(Settings);
             this.NavigationCacheMode = NavigationCacheMode.Required;
             LoadTrendingVideos();
             LoadHistory();
             SubscriptionManager.LoadSubscriptions();
+            InvidiousInstanceTextBox.Text = Settings.InvidiousInstance;
+            InvidiousInstanceCommentsTextBox.Text = Settings.InvidiousInstanceComments;
         }
 
         private async void LoadTrendingVideos()
@@ -113,7 +116,7 @@ namespace ValleyTube
 
         public static async Task<List<VideoResult>> FetchLatestVideosAsync(string authorId)
         {
-            string apiUrl = Settings.InvidiousInstance + $"/api/v1/channels/{authorId}";
+            string apiUrl = Settings.InvidiousInstance + "/api/v1/channels/{authorId}";
 
             using (HttpClient client = new HttpClient())
             {
@@ -152,6 +155,90 @@ namespace ValleyTube
             videos.Sort(CompareVideosByPublished);
 
             return videos;
+        }
+
+        private async void LoadRecommendedVideos()
+        {
+            if (_videoHistory == null || _videoHistory.Count == 0)
+            {
+                ShowShit("Watch a video to get recommended!");
+                return;
+            }
+
+            var recommendedVideosList = new List<VideoResult>();
+            var addedVideoIds = new HashSet<string>();
+            var historyVideoChannelIds = new HashSet<string>();
+
+            foreach (var video in _videoHistory)
+            {
+                if (!string.IsNullOrEmpty(video.AuthorId))
+                {
+                    historyVideoChannelIds.Add(video.AuthorId);
+                }
+            }
+
+            var tasks = new List<Task>();
+
+            foreach (var video in _videoHistory)
+            {
+                string videoId = video.VideoId;
+                string videoUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
+
+                tasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (var client = new HttpClient())
+                        {
+                            var response = await client.GetStringAsync(videoUrl);
+                            var videoData = JsonConvert.DeserializeObject<VideoData>(response);
+
+                            if (videoData != null && videoData.RecommendedVideos != null)
+                            {
+                                var tempRecommendedVideos = new List<VideoResult>();
+
+                                foreach (var recommendedVideo in videoData.RecommendedVideos)
+                                {
+                                    if (!historyVideoChannelIds.Contains(recommendedVideo.AuthorId) &&
+                                        !addedVideoIds.Contains(recommendedVideo.VideoId) &&
+                                        tempRecommendedVideos.Count < 2)
+                                    {
+                                        tempRecommendedVideos.Add(recommendedVideo);
+                                        addedVideoIds.Add(recommendedVideo.VideoId);
+                                    }
+                                }
+
+                                lock (recommendedVideosList)
+                                {
+                                    recommendedVideosList.AddRange(tempRecommendedVideos);
+                                }
+
+                                if (recommendedVideosList.Count >= 10)
+                                {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error fetching recommended videos from {videoUrl}: {ex.Message}");
+                    }
+                }));
+            }
+
+            await Task.WhenAll(tasks);
+
+            if (recommendedVideosList.Count > 0)
+            {
+                RecommendedListView.ItemsSource = recommendedVideosList;
+                RecTextNoHistroy.Text = string.Empty;
+            }
+            else
+            {
+                RecommendedListView.ItemsSource = null;
+                RecTextNoHistroy.Text = "No recommendations available. Watch more videos to get recommendations!";
+            }
         }
 
         private static int CompareVideosByPublished(VideoResult v1, VideoResult v2)
@@ -278,6 +365,9 @@ namespace ValleyTube
                 case "subscriptions":
                     LoadSubscribedChannelsVideos();
                     break;
+                case "recommended":
+                    LoadRecommendedVideos();
+                    break;
                 default:
                     System.Diagnostics.Debug.WriteLine("Unhandled PivotItem header: " + selectedItem.Header);
                     break;
@@ -347,6 +437,7 @@ namespace ValleyTube
             StatusMessageTextBlock.Visibility = Visibility.Collapsed;
         }
 
+
         // Buttons and Similar Ui Elements
 
         private async void ClearSubcriptions_Click(object sender, RoutedEventArgs e)
@@ -354,6 +445,11 @@ namespace ValleyTube
             SubscriptionManager.ClearSubscriptions();
             SubscriptionManager.SaveSubscriptions();
 
+        }
+
+        private async void ClearHistory_Click(object sender, RoutedEventArgs e)
+        {
+            ClearHistory();
         }
 
         private void AutoplayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -389,6 +485,16 @@ namespace ValleyTube
                 Frame.Navigate(typeof(VideoPage), video.VideoId);
                 SaveHistory(video);
             }
+        }
+
+        private void SetInvidiousInstanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.InvidiousInstance = InvidiousInstanceTextBox.Text;
+        }
+
+        private void SetInvidiousInstanceCommentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.InvidiousInstanceComments = InvidiousInstanceCommentsTextBox.Text;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
@@ -486,6 +592,12 @@ namespace ValleyTube
         public string resolution { get; set; }
     }
 
+    public class VideoData
+    {
+        [JsonProperty("recommendedVideos")]
+        public List<VideoResult> RecommendedVideos { get; set; }
+    }
+
     public class VideoThumbnail
     {
         public string Quality { get; set; }
@@ -508,6 +620,7 @@ namespace ValleyTube
         public List<VideoThumbnail> VideoThumbnails { get; set; }
         public bool IsFavorite { get; set; }
         public long Published { get; set; }
+        public string AuthorId { get; set; }
     }
 
     public class Channel

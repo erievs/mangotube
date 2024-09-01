@@ -7,12 +7,11 @@ namespace ValleyTube
     {
         private static bool _isDash;
         private static bool _isAutoplayEnabled;
-        private static string _selectedQuality; // New field for video quality
+        private static string _selectedQuality;
+        private static string _invidiousInstance = "https://iv.ggtyler.dev";
+        private static string _invidiousInstanceComments = "https://inv.nadeko.net";
 
         public const int MaxHistorySize = 50;
-
-        public static string InvidiousInstance = "https://invidious.nerdvpn.de";
-        public static string InvidiousInstanceComments = "https://inv.nadeko.net";
 
         public static bool isDash
         {
@@ -34,7 +33,6 @@ namespace ValleyTube
             }
         }
 
-
         public static string SelectedQuality
         {
             get { return _selectedQuality; }
@@ -45,11 +43,31 @@ namespace ValleyTube
             }
         }
 
+        public static string InvidiousInstance
+        {
+            get { return _invidiousInstance; }
+            set
+            {
+                _invidiousInstance = value;
+                SaveSetting("InvidiousInstance", value);
+            }
+        }
+
+        public static string InvidiousInstanceComments
+        {
+            get { return _invidiousInstanceComments; }
+            set
+            {
+                _invidiousInstanceComments = value;
+                SaveSetting("InvidiousInstanceComments", value);
+            }
+        }
+
         static Settings()
         {
             _isDash = false;
             _isAutoplayEnabled = true;
-            _selectedQuality = "480"; 
+            _selectedQuality = "480";
             LoadSettings();
         }
 
@@ -76,6 +94,16 @@ namespace ValleyTube
             if (localSettings.Values.ContainsKey("SelectedQuality"))
             {
                 _selectedQuality = (string)localSettings.Values["SelectedQuality"];
+            }
+
+            if (localSettings.Values.ContainsKey("InvidiousInstance"))
+            {
+                _invidiousInstance = (string)localSettings.Values["InvidiousInstance"];
+            }
+
+            if (localSettings.Values.ContainsKey("InvidiousInstanceComments"))
+            {
+                _invidiousInstanceComments = (string)localSettings.Values["InvidiousInstanceComments"];
             }
         }
     }
