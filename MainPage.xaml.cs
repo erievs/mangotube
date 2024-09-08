@@ -389,20 +389,24 @@ namespace ValleyTube
 
         private void SaveHistoryTrend(TrendingVideo video)
         {
+
             var videoResult = new VideoResult
             {
                 VideoId = video.VideoId,
                 Title = video.Title,
                 Author = video.Author,
-                Thumbnail = new ValleyTube.Thumbnail
-                {
-                    Url = video.ThumbnailUrl
-                }
+
+                VideoThumbnails = new List<VideoThumbnail>
+        {
+            new VideoThumbnail
+            {
+                Url = video.ThumbnailUrl
+            }
+        }
             };
 
             AddVideoToHistory(videoResult);
         }
-
 
         private static void AddVideoToHistory(VideoResult video)
         {
@@ -487,6 +491,7 @@ namespace ValleyTube
                 SaveHistory(video);
             }
         }
+
 
         private void SetInvidiousInstanceButton_Click(object sender, RoutedEventArgs e)
         {
@@ -584,6 +589,9 @@ namespace ValleyTube
         public string VideoId { get; set; }
         public string author { get; set; }
         public string published { get; set; }
+        public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
+        public Thumbnail Thumbnail { get; set; }
+
     }
 
     public class VideoFormat
@@ -623,10 +631,11 @@ namespace ValleyTube
         public string ViewCountText { get; set; }
         public string PublishedText { get; set; }
         public Thumbnail Thumbnail { get; set; }
-        public List<VideoThumbnail> VideoThumbnails { get; set; }
+        public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
         public bool IsFavorite { get; set; }
         public long Published { get; set; }
         public string AuthorId { get; set; }
+
     }
 
     public class Channel

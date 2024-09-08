@@ -37,7 +37,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
+                                <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                 </Button>
                                 <StackPanel>
