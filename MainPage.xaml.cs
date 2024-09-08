@@ -591,6 +591,26 @@ namespace ValleyTube
         public string published { get; set; }
         public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
         public Thumbnail Thumbnail { get; set; }
+        public int LengthSeconds { get; set; }
+
+        public string LengthFormatted
+        {
+            get
+            {
+                TimeSpan timeSpan = TimeSpan.FromSeconds(LengthSeconds);
+
+                if (timeSpan.TotalMinutes < 100)
+                {
+
+                    return timeSpan.ToString(@"mm\:ss");
+                }
+                else
+                {
+
+                    return timeSpan.ToString(@"hh\:mm\:ss");
+                }
+            }
+        }
 
     }
 
@@ -635,6 +655,26 @@ namespace ValleyTube
         public bool IsFavorite { get; set; }
         public long Published { get; set; }
         public string AuthorId { get; set; }
+        public int LengthSeconds { get; set; }
+
+        public string LengthFormatted
+        {
+            get
+            {
+                TimeSpan timeSpan = TimeSpan.FromSeconds(LengthSeconds);
+
+                if (timeSpan.TotalMinutes < 100)
+                {
+
+                    return timeSpan.ToString(@"mm\:ss");
+                }
+                else
+                {
+
+                    return timeSpan.ToString(@"hh\:mm\:ss");
+                }
+            }
+        }
 
     }
 

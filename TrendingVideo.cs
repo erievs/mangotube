@@ -25,6 +25,26 @@ namespace ValleyTube
         public bool Premium { get; set; }
         public string Id { get; set; }
 
+
+        public string LengthFormatted
+        {
+            get
+            {
+                TimeSpan timeSpan = TimeSpan.FromSeconds(LengthSeconds);
+
+                if (timeSpan.TotalMinutes < 100)
+                {
+
+                    return timeSpan.ToString(@"mm\:ss");
+                }
+                else
+                {
+
+                    return timeSpan.ToString(@"hh\:mm\:ss");
+                }
+            }
+        }
+
         public string ThumbnailUrl
         {
             get

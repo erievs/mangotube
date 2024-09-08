@@ -46,7 +46,7 @@
         </StackPanel>
 
         <Pivot Margin="10" Grid.Row="1">
-            <PivotItem Header="Description">
+            <PivotItem Header="details">
                 <ScrollViewer>
                     <StackPanel>
 
@@ -99,7 +99,7 @@
                 </ScrollViewer>
             </PivotItem>
 
-            <PivotItem Header="Comments">
+            <PivotItem Header="comments">
                 <ScrollViewer x:Name="CommentsScrollViewer">
                     <StackPanel>
                         <ListView x:Name="CommentsListView" Margin="10">
@@ -117,15 +117,18 @@
                 </ScrollViewer>
             </PivotItem>
 
-            <PivotItem Header="Related Videos">
+            <PivotItem Header="related videos">
                 <ScrollViewer>
                     <ListView x:Name="RelatedVideosListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="Button_Click_3">
+                                    <Grid>
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                    </Button>
+                                        <Border Background="Black" Opacity="0.8" CornerRadius="0" Padding="0" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                     <StackPanel>
                                         <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
                                         <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>

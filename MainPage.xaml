@@ -16,7 +16,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -38,7 +43,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
-                                    <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -57,7 +67,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -76,7 +91,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -95,7 +115,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -114,7 +139,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                    <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -128,14 +158,19 @@
                 </ListView>
             </PivotItem>
 
-            
+
             <PivotItem Header="history">
                 <ListView x:Name="HistoryListView">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
-                                    <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -148,7 +183,6 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
-
             <PivotItem Header="search">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -164,7 +198,12 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10">
                                     <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="SearchButton_Click">
-                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Grid>
+                                            <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                            <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                            </Border>
+                                        </Grid>
                                     </Button>
                                     <StackPanel>
                                         <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
@@ -188,7 +227,12 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
-                                    <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                    <Grid>
+                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
                                 </Button>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
