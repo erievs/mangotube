@@ -25,6 +25,7 @@ namespace ValleyTube
             this.InitializeComponent();
             InitializeSyncTimer();
             SubscriptionManager.LoadSubscriptions();
+
         }
 
         private void InitializeSyncTimer()

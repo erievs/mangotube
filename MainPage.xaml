@@ -260,7 +260,7 @@
                               Width="150">
                                     <ComboBoxItem Content="144p" Tag="144"/>
                                     <ComboBoxItem Content="240p" Tag="240"/>
-                                    <ComboBoxItem Content="360p Direct" Tag="360p-direct" IsSelected="True"/>
+                                    <ComboBoxItem Content="360p Direct" Tag="360p-direct"/>
                                     <ComboBoxItem Content="360p" Tag="360"/>
                                     <ComboBoxItem Content="480p" Tag="480"/>
                                     <ComboBoxItem Content="720p" Tag="720"/>
@@ -288,6 +288,21 @@
                            TextWrapping="Wrap" 
                            Margin="0,5,0,0"/>
                         </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <TextBlock Text="Screen Time Off" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="TimeoffToggleSwitch" 
+                                    Toggled="TimeoffToggleSwitch_Toggled" 
+                                    Margin="20,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Text="Enable this option to have the display auto turn off after a little bit (depends on your system settings). You will need to close and relaunch the app to take effect."
+                                    FontSize="16" 
+                                    Foreground="LightGray" 
+                                    TextWrapping="Wrap" 
+                                    Margin="0,5,0,0"/>
+                        </StackPanel>
+
 
                         <!-- Import Subscriptions -->
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
@@ -356,6 +371,19 @@
                         Margin="0,10,0,0"
                         Click="ClearHistory_Click"/>
                             <TextBlock Text="Click this button to clear history."
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:Name="ClearSavedSettings" 
+                        Content="Clear Saved Settings" 
+                        FontSize="20" 
+                        Margin="0,10,0,0"
+                        Click="ClearSavedSettings_Click"/>
+                            <TextBlock Text="Click this button to clear saved settings (requires restart of the app!)."
                            FontSize="16" 
                            Foreground="LightGray" 
                            TextWrapping="Wrap" 

@@ -7,7 +7,8 @@ namespace ValleyTube
     {
         private static bool _isDash;
         private static bool _isAutoplayEnabled;
-        private static string _selectedQuality;
+        public static string _selectedQuality;
+        private static bool _screenTimeOut;
         private static string _invidiousInstance = "https://iv.ggtyler.dev";
         private static string _invidiousInstanceComments = "https://inv.nadeko.net";
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
@@ -31,6 +32,16 @@ namespace ValleyTube
             {
                 _isAutoplayEnabled = value;
                 SaveSetting("IsAutoplayEnabled", value);
+            }
+        }
+
+        public static bool ScreenTimeOut
+        {
+            get { return _screenTimeOut; }
+            set
+            {
+                _screenTimeOut = value;
+                SaveSetting("IsScreenTimeoutEnabled", value);
             }
         }
 
@@ -74,18 +85,17 @@ namespace ValleyTube
             }
         }
 
-        static Settings()
-        {
-            _isDash = false;
-            _isAutoplayEnabled = true;
-            _selectedQuality = "480";
-            LoadSettings();
-        }
-
-        private static void SaveSetting(string key, object value)
+        public static void SaveSetting(string key, object value)
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             localSettings.Values[key] = value;
+        }
+
+        public static void ClearSettings()
+        {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+
+            localSettings.Values.Clear();
         }
 
         public static void LoadSettings()
@@ -102,6 +112,11 @@ namespace ValleyTube
                 _isAutoplayEnabled = (bool)localSettings.Values["IsAutoplayEnabled"];
             }
 
+            if (localSettings.Values.ContainsKey("IsScreenTimeoutEnabled"))
+            {
+                _screenTimeOut = (bool)localSettings.Values["IsScreenTimeoutEnabled"];
+            }
+
             if (localSettings.Values.ContainsKey("SelectedQuality"))
             {
                 _selectedQuality = (string)localSettings.Values["SelectedQuality"];
@@ -116,6 +131,12 @@ namespace ValleyTube
             {
                 _invidiousInstanceComments = (string)localSettings.Values["InvidiousInstanceComments"];
             }
+
+            if (localSettings.Values.ContainsKey("ReturnDislikeInstance"))
+            {
+                _returnDislikeInstance = (string)localSettings.Values["ReturnDislikeInstance"];
+            }
+
         }
     }
 }

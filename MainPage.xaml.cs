@@ -19,6 +19,7 @@ namespace ValleyTube
         private int _currentPage = 1;
         private const int _resultsPerPage = 20;
         private static List<VideoResult> _videoHistory = new List<VideoResult>();
+        public Windows.System.Display.DisplayRequest displayRequest = null;
 
         public MainPage()
         {
@@ -27,13 +28,62 @@ namespace ValleyTube
             this.NavigationCacheMode = NavigationCacheMode.Required;
             LoadTrendingVideos();
             LoadHistory();
+            Settings.LoadSettings();
             SubscriptionManager.LoadSubscriptions();
+
             InvidiousInstanceTextBox.Text = Settings.InvidiousInstance;
             InvidiousInstanceCommentsTextBox.Text = Settings.InvidiousInstanceComments;
             ReturnDislikesTextBox.Text = Settings.ReturnDislikeInstance;
+            TimeoffToggleSwitch.IsOn = Settings.ScreenTimeOut;
+            AutoplayToggleSwitch.IsOn = Settings.IsAutoplayEnabled;
+
+            System.Diagnostics.Debug.WriteLine(Settings.ScreenTimeOut);
+
+            InitializeDisplayRequest();
+
+            SetComboBoxSelection(QualityComboBox, Settings.SelectedQuality);
+
         }
 
-        private async void LoadTrendingVideos()
+        private void SetComboBoxSelection(ComboBox comboBox, string selectedQuality)
+        {
+
+            string qualityToSelect = string.IsNullOrEmpty(selectedQuality) ? "360p-direct" : selectedQuality;
+
+            foreach (ComboBoxItem item in comboBox.Items)
+            {
+                if ((string)item.Tag == qualityToSelect)
+                {
+                    comboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        private void InitializeDisplayRequest()
+        {
+            if (Settings.ScreenTimeOut)
+            {
+
+                if (displayRequest != null)
+                {
+                    displayRequest.RequestRelease();
+                    displayRequest = null;
+                }
+            }
+            else
+            {
+
+                if (displayRequest == null)
+                {
+                    displayRequest = new Windows.System.Display.DisplayRequest();
+                    displayRequest.RequestActive();
+                }
+            }
+        }
+    
+
+    private async void LoadTrendingVideos()
         {
             string apiUrl = Settings.InvidiousInstance + "/api/v1/trending";
             await FetchData(apiUrl, TrendingListView);
@@ -457,6 +507,11 @@ namespace ValleyTube
             ClearHistory();
         }
 
+        private async void ClearSavedSettings_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.ClearSettings();
+        }
+
         private void AutoplayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             Settings.IsAutoplayEnabled = AutoplayToggleSwitch.IsOn;
@@ -492,6 +547,15 @@ namespace ValleyTube
             }
         }
 
+        private void TimeoffToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                Settings.ScreenTimeOut = toggleSwitch.IsOn;
+                InitializeDisplayRequest();
+            }
+        }
 
         private void SetInvidiousInstanceButton_Click(object sender, RoutedEventArgs e)
         {
@@ -554,7 +618,10 @@ namespace ValleyTube
 
                     System.Diagnostics.Debug.WriteLine("Quality Tag: " + qualityTag);
 
+                    Settings._selectedQuality = qualityTag;
+
                     Settings.SelectedQuality = qualityTag;
+
                 }
                 else
                 {
