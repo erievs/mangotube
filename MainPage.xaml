@@ -281,8 +281,17 @@
                             Margin="0,5,0,0"/>
                         </StackPanel>
 
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="Return Dislikes API Instance" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBox x:Name="ReturnDislikesTextBox" 
+                            Text="{Binding Path=ReturnDislikeInstance}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+                            <Button Content="Set Return Dislikes API Instance" 
+                            Click="SetReturnDislikesTextBoxButton_Click" 
+                            Margin="0,5,0,0"/>
+                        </StackPanel>
 
-                        <!-- Clear Subscriptions -->
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
                             <Button x:Name="ClearSubcriptions" 
                         Content="Clear Subscriptions" 

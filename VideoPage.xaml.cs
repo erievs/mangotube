@@ -8,6 +8,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media;
+using Newtonsoft.Json.Linq;
 
 namespace ValleyTube
 {
@@ -67,6 +68,7 @@ namespace ValleyTube
                 videoId = parameter;
                 System.Diagnostics.Debug.WriteLine("Navigated to VideoPage with videoId: " + videoId);
 
+                LoadLikesDislikesData(videoId);
                 await LoadVideoDetails();
                 await LoadRelatedVideos();
                 await LoadComments();
@@ -74,6 +76,57 @@ namespace ValleyTube
             else
             {
                 System.Diagnostics.Debug.WriteLine("Error: Parameter is not a valid string.");
+            }
+        }
+
+        public async void LoadLikesDislikesData(string videoId)
+        {
+            var url = $"{Settings.ReturnDislikeInstance}/Votes?videoId={videoId}";
+
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    var response = await httpClient.GetStringAsync(url);
+
+                    if (response.StartsWith("<"))
+                    {
+
+                        System.Diagnostics.Debug.WriteLine("Received HTML instead of JSON. Response: " + response);
+                        LikesTextBlock.Text = "[N/A] Likes";
+                        DislikesTextBlock.Text = "[N/A] Dislikes";
+                        return;
+                    }
+
+                    var jsonData = JObject.Parse(response);
+
+                    var likes = (int)jsonData["likes"];
+                    var dislikes = (int)jsonData["dislikes"];
+
+                    LikesTextBlock.Text = $"{likes:N0} Likes";
+                    DislikesTextBlock.Text = $"{dislikes:N0} Dislikes";
+                }
+                catch (HttpRequestException ex)
+                {
+
+                    LikesTextBlock.Text = "[N/A] Likes";
+                    DislikesTextBlock.Text = "[N/A] Dislikes";
+                    System.Diagnostics.Debug.WriteLine($"Error fetching data: {ex.Message}");
+                }
+                catch (JsonReaderException ex)
+                {
+
+                    LikesTextBlock.Text = "[N/A] Likes";
+                    DislikesTextBlock.Text = "[N/A] Dislikes";
+                    System.Diagnostics.Debug.WriteLine($"Error parsing JSON: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+
+                    LikesTextBlock.Text = "[N/A] Likes";
+                    DislikesTextBlock.Text = "[N/A] Dislikes";
+                    System.Diagnostics.Debug.WriteLine($"Unexpected error: {ex.Message}");
+                }
             }
         }
 
@@ -94,21 +147,21 @@ namespace ValleyTube
                     Uri audioUri = null;
 
                     var selectedQuality = Settings.SelectedQuality;
-                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality);  // Log selected quality
+                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality); 
 
                     if (selectedQuality == "360p-direct")
                     {
                         string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", video.VideoId);
                         videoUri = new Uri(videoUrlString);
-                        System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri);  // Log video URL
+                        System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri); 
                     }
                     else
                     {
                         videoUri = GetBestVideoUri(video.adaptiveFormats, selectedQuality, out audioUri);
-                        System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found"));  // Log video URL
+                        System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found")); 
                         if (audioUri != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri);  // Log audio URL
+                            System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri); 
                         }
                     }
 

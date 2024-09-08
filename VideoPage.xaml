@@ -78,6 +78,17 @@
                             </StackPanel>
                         </StackPanel>
 
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0">
+                            <TextBlock x:Name="LikesTextBlock"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Margin="10,0,10,0"/>
+
+                            <TextBlock x:Name="DislikesTextBlock"
+                                   FontSize="16"
+                                   Foreground="White"/>
+                        </StackPanel>
+
                         <TextBlock x:Name="DescriptionTextBlock"
                                TextWrapping="Wrap"
                                FontSize="16"

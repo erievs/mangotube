@@ -10,6 +10,7 @@ namespace ValleyTube
         private static string _selectedQuality;
         private static string _invidiousInstance = "https://iv.ggtyler.dev";
         private static string _invidiousInstanceComments = "https://inv.nadeko.net";
+        private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
 
         public const int MaxHistorySize = 50;
 
@@ -60,6 +61,16 @@ namespace ValleyTube
             {
                 _invidiousInstanceComments = value;
                 SaveSetting("InvidiousInstanceComments", value);
+            }
+        }
+
+        public static string ReturnDislikeInstance
+        {
+            get { return _returnDislikeInstance; }
+            set
+            {
+                _returnDislikeInstance = value;
+                SaveSetting("ReturnDislikeInstance", value);
             }
         }
 

@@ -30,6 +30,7 @@ namespace ValleyTube
             SubscriptionManager.LoadSubscriptions();
             InvidiousInstanceTextBox.Text = Settings.InvidiousInstance;
             InvidiousInstanceCommentsTextBox.Text = Settings.InvidiousInstanceComments;
+            ReturnDislikesTextBox.Text = Settings.ReturnDislikeInstance;
         }
 
         private async void LoadTrendingVideos()
@@ -495,6 +496,11 @@ namespace ValleyTube
         private void SetInvidiousInstanceCommentsButton_Click(object sender, RoutedEventArgs e)
         {
             Settings.InvidiousInstanceComments = InvidiousInstanceCommentsTextBox.Text;
+        }
+
+        private void SetReturnDislikesTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.ReturnDislikeInstance = ReturnDislikesTextBox.Text;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
