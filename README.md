@@ -8,6 +8,8 @@ New update coming probbaly friday or thursday or this weekend!
 
 invidious is having some issues on all instances please wait for a fix
 
+https://inv.nadeko.net - this instance works (I am working on setting to be the default soon)
+
 # Credits
 
 poplol - created the logo
