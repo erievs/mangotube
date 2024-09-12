@@ -9,11 +9,11 @@ namespace ValleyTube
         private static bool _isAutoplayEnabled;
         public static string _selectedQuality;
         private static bool _screenTimeOut;
-        private static string _invidiousInstance = "https://iv.ggtyler.dev";
+        private static string _invidiousInstance = "https://invidious.privacyredirect.com";
         private static string _invidiousInstanceComments = "https://inv.nadeko.net";
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
 
-        public const int MaxHistorySize = 50;
+        public const int MaxHistorySize = 200;
 
         public static bool isDash
         {

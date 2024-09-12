@@ -61,21 +61,23 @@
                             Foreground="White"
                             VerticalAlignment="Center"/>
 
-
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
-                                <TextBlock x:Name="AuthorTextBlock"
+                            <Button Background="Transparent" BorderBrush="Transparent" Click="AuthorButton_Click" Padding="0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                    <TextBlock x:Name="AuthorTextBlock"
                                        
                                    FontSize="16"
                                    Foreground="White"
                                    Text="" 
                                    Margin="0,0,5,0"/>
 
-                                <TextBlock x:Name="DateTextBlock"
+                                    <TextBlock x:Name="DateTextBlock"
                                    FontSize="16"
                                    Foreground="White"
                                    Text=""/>
 
-                            </StackPanel>
+                                </StackPanel>
+                            </Button>
+                            
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0">
@@ -123,12 +125,14 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Grid>
-                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                        <Border Background="Black" Opacity="0.8" CornerRadius="0" Padding="0" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
-                                        </Border>
-                                    </Grid>
+                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
+                                        <Grid>
+                                            <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                            <Border Background="Black" Opacity="0.8" CornerRadius="0" Padding="0" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Button>
                                     <StackPanel>
                                         <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
                                         <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>

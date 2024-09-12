@@ -1,0 +1,88 @@
+﻿<Page
+    x:Class="ValleyTube.ChannelPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ValleyTube"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button x:Name="BackButton" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" 
+                Margin="10,10,0,0" 
+                Click="BackButton_Click" 
+                Background="Transparent" 
+                BorderBrush="Gray" 
+                BorderThickness="2">
+            <SymbolIcon Symbol="Back"/>
+        </Button>
+
+        <Pivot Grid.Row="1" Margin="0,10,0,0">
+
+            <PivotItem Header="details">
+                <ScrollViewer>
+                    <StackPanel>
+                        <Image x:Name="ChannelBanner" Stretch="Fill" Height="200" Margin="0,0,0,10"/>
+
+                        <StackPanel Margin="10">
+                            <TextBlock x:Name="ChannelTitle" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock x:Name="ChannelDescription" TextWrapping="Wrap" FontSize="16" Foreground="White" Margin="0,10,0,0"/>
+                            <TextBlock x:Name="ChannelStatsTextBlock" FontSize="16" Foreground="White"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <PivotItem Header="videos">
+                <ScrollViewer>
+                    <ListView x:Name="VideosListView">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
+                                        <Grid>
+                                            <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                            <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Button>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{Binding title}" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding author}" FontStyle="Italic"/>
+                                        <TextBlock Text="{Binding publishedText}"/>
+                                        <TextBlock Text="{Binding viewCountText}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
+            </PivotItem>
+
+            <PivotItem Header="community">
+                <ScrollViewer>
+                    <ListView x:Name="CommunityListView">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Margin="10">
+                                    <TextBlock Text="{Binding author}" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding content}" FontSize="14" Foreground="Gray" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
+            </PivotItem>
+
+        </Pivot>
+    </Grid>
+</Page>

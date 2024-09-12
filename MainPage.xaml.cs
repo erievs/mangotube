@@ -437,7 +437,7 @@ namespace ValleyTube
             AddVideoToHistory(video);
         }
 
-        private void SaveHistoryTrend(TrendingVideo video)
+        public static void SaveHistoryTrend(TrendingVideo video)
         {
 
             var videoResult = new VideoResult
@@ -445,6 +445,7 @@ namespace ValleyTube
                 VideoId = video.VideoId,
                 Title = video.Title,
                 Author = video.Author,
+                
 
                 VideoThumbnails = new List<VideoThumbnail>
         {
@@ -659,6 +660,7 @@ namespace ValleyTube
         public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
         public Thumbnail Thumbnail { get; set; }
         public int LengthSeconds { get; set; }
+        public string authorId { get; set; }
 
         public string LengthFormatted
         {

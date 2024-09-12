@@ -15,6 +15,7 @@ namespace ValleyTube
     public sealed partial class VideoPage : Page
     {
         private string videoId;
+        private string aurthorId;
         private string continuationToken;
         private DispatcherTimer syncTimer;
         private bool isSyncing = false;
@@ -143,6 +144,7 @@ namespace ValleyTube
                     var video = JsonConvert.DeserializeObject<VideoDetail>(response);
 
                     VideoTitle.Text = video.Title;
+                    aurthorId = video.authorId;
 
                     Uri videoUri = null;
                     Uri audioUri = null;
@@ -493,25 +495,30 @@ namespace ValleyTube
             }
         }
 
-        private void Button_Click_3(object sender, RoutedEventArgs e)
+        private void ImageButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
+
             if (button != null)
             {
-
-                Image image = button.Content as Image;
-                if (image != null)
+                // Instead of casting Content to Image, access DataContext directly from the Button 
+                VideoResult video = button.DataContext as VideoResult;
+                if (video != null)
                 {
-                    VideoResult video = image.DataContext as VideoResult;
-                    if (video != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
-                        Frame.Navigate(typeof(VideoPage), video.VideoId);
-                        MainPage.SaveHistory(video);
-                    }
+                    System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
+                    Frame.Navigate(typeof(VideoPage), video.VideoId);
+                    MainPage.SaveHistory(video);
                 }
             }
         }
+
+        private void AuthorButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Navigating to channel with ID: " + aurthorId);
+            Frame.Navigate(typeof(ChannelPage), aurthorId);
+        }
+
+
 
         private void Button_Click_1(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
