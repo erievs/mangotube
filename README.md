@@ -14,6 +14,8 @@ https://inv.nadeko.net - this instance works (I am working on setting to be the 
 
 poplol - created the logo
 
+returndislike - for their api (https://returnyoutubedislike.com/)
+
 # Todo
 
 Background Audio
