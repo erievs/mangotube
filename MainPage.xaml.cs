@@ -10,16 +10,20 @@ using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Media;
+using System.Collections.ObjectModel;
 
 namespace ValleyTube
 {
     public sealed partial class MainPage : Page
     {
-        private List<VideoResult> _searchResults = new List<VideoResult>();
+        private ObservableCollection<VideoResult> _searchResults = new ObservableCollection<VideoResult>();
         private int _currentPage = 1;
         private const int _resultsPerPage = 20;
         private static List<VideoResult> _videoHistory = new List<VideoResult>();
         public Windows.System.Display.DisplayRequest displayRequest = null;
+        private bool _isSearching = false;
+        private bool _hasMoreResults = true; 
 
         public MainPage()
         {
@@ -297,8 +301,11 @@ namespace ValleyTube
             return v2.Published.CompareTo(v1.Published);
         }
 
-        private async void Search(string query, int page = 1)
+        private async Task Search(string query, int page = 1)
         {
+            if (_isSearching || !_hasMoreResults) return;
+
+            _isSearching = true;
             string apiUrl = string.Format(Settings.InvidiousInstance + "/api/v1/search?q={0}&page={1}&sort=relevance",
                                             Uri.EscapeDataString(query), page);
 
@@ -309,26 +316,24 @@ namespace ValleyTube
                     var response = await httpClient.GetStringAsync(apiUrl);
                     var searchResults = JsonConvert.DeserializeObject<List<VideoResult>>(response);
 
-                    var validResults = new List<VideoResult>();
+                    if (searchResults == null || searchResults.Count == 0)
+                    {
+                        _hasMoreResults = false;
+                        return;
+                    }
+
                     foreach (var video in searchResults)
                     {
                         if (!string.IsNullOrEmpty(video.VideoId))
                         {
-                            validResults.Add(video);
+                            _searchResults.Add(video);
                         }
                     }
 
                     if (page == 1)
                     {
-                        _searchResults = validResults;
+                        SearchListView.ItemsSource = _searchResults;
                     }
-                    else
-                    {
-                        _searchResults.AddRange(validResults);
-                    }
-
-                    SearchListView.ItemsSource = null;
-                    SearchListView.ItemsSource = _searchResults;
 
                     _currentPage = page;
                 }
@@ -336,7 +341,62 @@ namespace ValleyTube
                 {
                     System.Diagnostics.Debug.WriteLine("Error fetching search results: " + ex.Message);
                 }
+                finally
+                {
+                    _isSearching = false;
+                }
             }
+        }
+
+        private void SearchListView_Loaded(object sender, RoutedEventArgs e)
+        {
+            var scrollViewer = GetScrollViewer(SearchListView);
+            if (scrollViewer != null)
+            {
+
+                scrollViewer.ViewChanged += ScrollViewer_ViewChanged;
+            }
+        }
+
+        private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                // Check if we are near the bottom of the ListView
+                if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
+                {
+                    string query = SearchBox.Text.Trim();
+                    if (!string.IsNullOrEmpty(query) && _hasMoreResults)
+                    {
+                        _currentPage++;
+                        Debug.WriteLine($"Loading Page: {_currentPage}");
+
+                         Search(query, _currentPage);
+                    }
+                }
+            }
+        }
+
+
+        private ScrollViewer GetScrollViewer(DependencyObject depObj)
+        {
+            if (depObj is ScrollViewer)
+            {
+                return (ScrollViewer)depObj;
+            }
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(depObj, i);
+                var result = GetScrollViewer(child);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -347,24 +407,18 @@ namespace ValleyTube
             if (!string.IsNullOrWhiteSpace(query))
             {
                 _currentPage = 1;
+                _hasMoreResults = true;
+                _searchResults.Clear();
                 Search(query);
             }
             else
             {
                 _searchResults.Clear();
                 SearchListView.ItemsSource = null;
+                _hasMoreResults = true;
             }
         }
 
-        private void LoadMoreButton_Click(object sender, RoutedEventArgs e)
-        {
-            string query = SearchBox.Text.Trim();
-            if (!string.IsNullOrEmpty(query))
-            {
-                _currentPage++;
-                Search(query, _currentPage);
-            }
-        }
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -471,8 +525,16 @@ namespace ValleyTube
 
             try
             {
-                var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+
                 string jsonHistory = JsonConvert.SerializeObject(_videoHistory);
+
+                if (jsonHistory.Length > 1024 * 1024)
+                {
+                    Debug.WriteLine("Video history size exceeds limit, not saving.");
+                    return;
+                }
+
+                var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
                 localSettings.Values["VideoHistory"] = jsonHistory;
             }
             catch (Exception ex)
@@ -480,7 +542,7 @@ namespace ValleyTube
 
                 Debug.WriteLine("Error saving video history: " + ex.Message);
             }
-        } 
+        }
 
         private async void ShowShit(string message)
         {
@@ -531,7 +593,7 @@ namespace ValleyTube
             if (video != null)
             {
                 Frame.Navigate(typeof(VideoPage), video.VideoId);
-                SaveHistoryTrend(video);
+         
             }
 
         }
@@ -544,7 +606,7 @@ namespace ValleyTube
             if (video != null)
             {
                 Frame.Navigate(typeof(VideoPage), video.VideoId);
-                SaveHistory(video);
+            
             }
         }
 

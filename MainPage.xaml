@@ -9,12 +9,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Pivot Name="BobIsYourUncle" Title="MANGOTUBE" SelectionChanged="Pivot_SelectionChanged">
+        <Pivot Name="BobIsYourUncle" Title="" SelectionChanged="Pivot_SelectionChanged">
             <PivotItem Header="trending">
                 <ListView x:Name="TrendingListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                     <Grid>
                                         <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -41,7 +41,7 @@
                    Grid.Row="0" Margin="1"/>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -65,7 +65,7 @@
                 <ListView x:Name="PopularListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                     <Grid>
                                         <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -89,7 +89,7 @@
                 <ListView x:Name="GamingListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                     <Grid>
                                         <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -113,7 +113,7 @@
                 <ListView x:Name="MusicListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                     <Grid>
                                         <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -137,7 +137,7 @@
                 <ListView x:Name="MoviesListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                     <Grid>
                                         <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -163,7 +163,7 @@
                 <ListView x:Name="HistoryListView">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -193,10 +193,10 @@
 
                     <TextBox x:Name="SearchBox" PlaceholderText="Search..." Margin="10" TextChanged="SearchBox_TextChanged" Grid.Row="0"/>
 
-                    <ListView x:Name="SearchListView" Margin="10" Grid.Row="1" ItemClick="TrendsListView_ItemClick">
+                    <ListView x:Name="SearchListView" Loaded="SearchListView_Loaded" Margin="10" Grid.Row="1" ItemClick="TrendsListView_ItemClick">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="10">
+                                <StackPanel Orientation="Horizontal" Margin="0">
                                     <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="SearchButton_Click">
                                         <Grid>
                                             <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -215,8 +215,6 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-
-                    <Button x:Name="LoadMoreButton" Content="Load More" Margin="10" VerticalAlignment="Bottom" Grid.Row="2" Click="LoadMoreButton_Click"/>
                 </Grid>
             </PivotItem>
 
@@ -225,7 +223,7 @@
                 <ListView x:Name="SubscriptionsListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
                                         <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>

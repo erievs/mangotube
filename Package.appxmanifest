@@ -27,5 +27,6 @@
   <Capabilities>
     <Capability Name="internetClientServer" />
     <Capability Name="removableStorage" />
+    <Capability Name="videosLibrary" />
   </Capabilities>
 </Package>

@@ -81,12 +81,26 @@ namespace ValleyTube
                 try
                 {
                     var response = await httpClient.GetStringAsync(videosUrl);
-                    var videosData = JsonConvert.DeserializeObject<VideoList>(response);
+                    System.Diagnostics.Debug.WriteLine("Raw JSON Response: " + response);
 
-                    if (videosData != null && videosData.latestVideos != null)
+                    var videoResponse = JsonConvert.DeserializeObject<VideoResponse>(response);
+
+                    if (videoResponse != null && videoResponse.videos != null)
                     {
-                        VideosListView.ItemsSource = videosData.latestVideos;
+                        VideosListView.ItemsSource = videoResponse.videos; 
                     }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error: videoResponse is null or videos is null.");
+                    }
+                }
+                catch (JsonSerializationException jsonEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("JSON Serialization Error: " + jsonEx.Message);
+                }
+                catch (HttpRequestException httpEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("HTTP Request Error: " + httpEx.Message);
                 }
                 catch (Exception ex)
                 {
@@ -94,7 +108,6 @@ namespace ValleyTube
                 }
             }
         }
-
 
         private async Task LoadCommunityPosts()
         {
@@ -111,6 +124,18 @@ namespace ValleyTube
                     {
                         CommunityListView.ItemsSource = communityData.comments;
                     }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error: communityData is null or comments is null.");
+                    }
+                }
+                catch (JsonSerializationException jsonEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("JSON Serialization Error: " + jsonEx.Message);
+                }
+                catch (HttpRequestException httpEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("HTTP Request Error: " + httpEx.Message);
                 }
                 catch (Exception ex)
                 {
@@ -118,9 +143,6 @@ namespace ValleyTube
                 }
             }
         }
-
-
-
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
@@ -148,13 +170,26 @@ namespace ValleyTube
     public class VideoObjectAgain
     {
         public string videoId { get; set; }
-        public string title { get; set; }
-        public string author { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
         public string description { get; set; }
-        public string publishedText { get; set; }
-        public string viewCountText { get; set; }
+        public string PublishedText { get; set; }
+        public string ViewCountText { get; set; }
         public List<ImageObject> videoThumbnails { get; set; }
         public int LengthSeconds { get; set; }
+
+
+        public string ThumbnailUrl
+        {
+            get
+            {
+                if (videoThumbnails != null && videoThumbnails.Count > 0)
+                {
+                    return videoThumbnails[0].Url;
+                }
+                return string.Empty;
+            }
+        }
 
         public string LengthFormatted
         {
@@ -178,6 +213,7 @@ namespace ValleyTube
     }
 
 
+
     public class Banner
     {
         public string Url { get; set; }
@@ -185,13 +221,17 @@ namespace ValleyTube
 
     public class CommunityResponse
     {
+        public string authorId { get; set; }
         public List<ChannelComment> comments { get; set; }
     }
 
     public class ChannelComment
     {
         public string attachmentType { get; set; }
-        public AttachmentBase attachment { get; set; } 
+
+        [JsonIgnore] 
+        public AttachmentBase attachment { get; set; }
+
         public string author { get; set; }
         public bool authorIsChannelOwner { get; set; }
         public string authorId { get; set; }
@@ -206,6 +246,7 @@ namespace ValleyTube
         public string publishedText { get; set; }
         public int replyCount { get; set; }
     }
+
 
 
     public abstract class AttachmentBase
@@ -245,6 +286,7 @@ namespace ValleyTube
       
     }
 
+
     public class ChannelObject
     {
         public string author { get; set; }
@@ -263,6 +305,11 @@ namespace ValleyTube
     public class VideoList
     {
         public List<VideoObjectAgain> latestVideos { get; set; }
+    }
+
+    public class VideoResponse
+    {
+        public List<VideoObjectAgain> videos { get; set; }
     }
 
 

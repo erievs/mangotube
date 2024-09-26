@@ -9,6 +9,8 @@ using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
+using Windows.UI.Notifications;
+using System.IO;
 
 namespace ValleyTube
 {
@@ -451,6 +453,85 @@ namespace ValleyTube
             isSyncing = false;
         }
 
+        private async Task DownloadVideo(string videoId)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"Starting download for video ID: {videoId}");
+
+                string fileName = $"youtubevideo_{videoId}.mp4";
+                var storageFolder = Windows.Storage.KnownFolders.VideosLibrary;
+                var file = await storageFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
+                System.Diagnostics.Debug.WriteLine($"File created: {file.Path}");
+
+                string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", videoId);
+                var videoUri = new Uri(videoUrlString);
+                System.Diagnostics.Debug.WriteLine($"Video URL: {videoUri.AbsoluteUri}");
+
+                using (var httpClient = new HttpClient())
+                {
+                    DownloadProgressLabel.Visibility = Visibility.Visible;
+                    DownloadProgressBar.Visibility = Visibility.Visible;
+
+                    var response = await httpClient.GetAsync(videoUri, HttpCompletionOption.ResponseHeadersRead);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        long totalBytes = response.Content.Headers.ContentLength ?? 0;
+                        using (var fileStream = await file.OpenStreamForWriteAsync())
+                        {
+                            var stream = await response.Content.ReadAsStreamAsync();
+                            byte[] buffer = new byte[8192];
+                            long totalRead = 0;
+                            int bytesRead;
+
+                            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer, 0, bytesRead);
+                                totalRead += bytesRead;
+
+                                if (totalBytes > 0)
+                                {
+                                    double progressPercentage = (double)totalRead / totalBytes * 100;
+                                    DownloadProgressBar.Value = progressPercentage;
+
+                                    System.Diagnostics.Debug.WriteLine($"Download progress: {progressPercentage:F2}%");
+                                }
+                            }
+                        }
+
+                        ShowToastNotification($"Download completed: {file.Path}");
+                        System.Diagnostics.Debug.WriteLine($"Download completed: {file.Path}");
+                    }
+                    else
+                    {
+                        ShowToastNotification($"Error downloading video: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Error downloading video: {response.ReasonPhrase}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error downloading video: " + ex.Message);
+                ShowToastNotification($"Download failed: {ex.Message}");
+            }
+            finally
+            {
+                DownloadProgressLabel.Visibility = Visibility.Collapsed;
+                DownloadProgressBar.Visibility = Visibility.Collapsed;
+                DownloadProgressBar.Value = 0;
+            }
+        }
+
+        private void ShowToastNotification(string message)
+        {
+            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+            var toastText = toastXml.GetElementsByTagName("text").FirstOrDefault();
+            toastText.InnerText = message;
+
+            var toast = new ToastNotification(toastXml);
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
+        }
+
 
         // Buttons and stuff 
 
@@ -501,7 +582,6 @@ namespace ValleyTube
 
             if (button != null)
             {
-                // Instead of casting Content to Image, access DataContext directly from the Button 
                 VideoResult video = button.DataContext as VideoResult;
                 if (video != null)
                 {
@@ -511,6 +591,20 @@ namespace ValleyTube
                 }
             }
         }
+
+
+        private async void DownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(videoId))
+            {
+                await DownloadVideo(videoId);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is null or empty.");
+            }
+        }
+
 
         private void AuthorButton_Click(object sender, RoutedEventArgs e)
         {
