@@ -644,7 +644,7 @@ namespace ValleyTube
                     var response = await httpClient.GetStringAsync(apiUrl);
                     var videoData = JsonConvert.DeserializeObject<VideoResult>(response);
 
-                    return videoData.authorId;
+                    return videoData.AuthorId;
                 }
                 catch (Exception ex)
                 {

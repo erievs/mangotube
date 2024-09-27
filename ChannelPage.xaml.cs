@@ -8,12 +8,20 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media.Imaging;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace ValleyTube
 {
     public sealed partial class ChannelPage : Page
     {
         private string channelId;
+        private string videoContinuation = string.Empty; 
+        private string communityContinuation;
+        private bool isLoadingMoreVideos = false;
+        public ObservableCollection<VideoObjectAgain> Videos { get; set; } = new ObservableCollection<VideoObjectAgain>();
 
         public ChannelPage()
         {
@@ -74,7 +82,7 @@ namespace ValleyTube
 
         private async Task LoadChannelVideos()
         {
-            string videosUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}/latest";
+            string videosUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}/videos";
 
             using (var httpClient = new HttpClient())
             {
@@ -87,7 +95,16 @@ namespace ValleyTube
 
                     if (videoResponse != null && videoResponse.videos != null)
                     {
-                        VideosListView.ItemsSource = videoResponse.videos; 
+                        Videos.Clear();
+                        foreach (var video in videoResponse.videos)
+                        {
+                            Videos.Add(video);
+                        }
+
+                        videoContinuation = videoResponse.continuation;
+                        System.Diagnostics.Debug.WriteLine("Continuation token updated: " + videoContinuation);
+
+                        VideosListView.ItemsSource = Videos;
                     }
                     else
                     {
@@ -109,6 +126,81 @@ namespace ValleyTube
             }
         }
 
+        private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+
+                System.Diagnostics.Debug.WriteLine($"ScrollViewer VerticalOffset: {scrollViewer.VerticalOffset}");
+                System.Diagnostics.Debug.WriteLine($"ScrollViewer ScrollableHeight: {scrollViewer.ScrollableHeight}");
+
+                double threshold = scrollViewer.ScrollableHeight * 0.2;
+
+                System.Diagnostics.Debug.WriteLine($"Threshold for loading more videos: {threshold}");
+
+                if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - threshold)
+                {
+                    System.Diagnostics.Debug.WriteLine("Reached the threshold, loading more videos.");
+                    LoadMoreVideos();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Not close enough to the bottom to load more videos.");
+                }
+            }
+        }
+
+        private async void LoadMoreVideos()
+        {
+            if (string.IsNullOrEmpty(videoContinuation))
+            {
+                System.Diagnostics.Debug.WriteLine("No continuation token available to load more videos.");
+                return;
+            }
+
+            string videosUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}/videos?continuation={videoContinuation}";
+
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    var response = await httpClient.GetStringAsync(videosUrl);
+                    System.Diagnostics.Debug.WriteLine("Raw JSON Response for more videos: " + response);
+
+                    var videoResponse = JsonConvert.DeserializeObject<VideoResponse>(response);
+
+                    if (videoResponse != null && videoResponse.videos != null && videoResponse.videos.Count > 0)
+                    {
+                        foreach (var video in videoResponse.videos)
+                        {
+                            Videos.Add(video);
+                        }
+
+                        videoContinuation = videoResponse.continuation;
+                        System.Diagnostics.Debug.WriteLine("Continuation token updated: " + videoContinuation);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("No more videos to load or videoResponse is null.");
+                    }
+                }
+                catch (JsonSerializationException jsonEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("JSON Serialization Error: " + jsonEx.Message);
+                }
+                catch (HttpRequestException httpEx)
+                {
+                    System.Diagnostics.Debug.WriteLine("HTTP Request Error: " + httpEx.Message);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error loading more videos: " + ex.Message);
+                }
+            }
+        }
+
         private async Task LoadCommunityPosts()
         {
             string communityUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}/community";
@@ -123,10 +215,53 @@ namespace ValleyTube
                     if (communityData != null && communityData.comments != null)
                     {
                         CommunityListView.ItemsSource = communityData.comments;
+                        communityContinuation = communityData.continuation;
                     }
                     else
                     {
                         System.Diagnostics.Debug.WriteLine("Error: communityData is null or comments is null.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error loading community posts: " + ex.Message);
+                }
+            }
+        }
+
+        private async void LoadMoreCommunityPosts()
+        {
+            if (string.IsNullOrEmpty(communityContinuation))
+            {
+                System.Diagnostics.Debug.WriteLine("No continuation token available to load more community posts.");
+                return;
+            }
+
+            string communityUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}/community?continuation={communityContinuation}";
+
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    var response = await httpClient.GetStringAsync(communityUrl);
+                    System.Diagnostics.Debug.WriteLine("Raw JSON Response for more community posts: " + response);
+
+                    var communityData = JsonConvert.DeserializeObject<CommunityResponse>(response);
+
+                    if (communityData != null && communityData.comments != null && communityData.comments.Count > 0)
+                    {
+
+                        foreach (var comment in communityData.comments)
+                        {
+                            ((List<ChannelComment>)CommunityListView.ItemsSource).Add(comment);
+                        }
+
+                        communityContinuation = communityData.continuation;
+                        System.Diagnostics.Debug.WriteLine("Continuation token updated for community posts: " + communityContinuation);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("No more community posts to load or communityData is null.");
                     }
                 }
                 catch (JsonSerializationException jsonEx)
@@ -139,7 +274,23 @@ namespace ValleyTube
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error loading community posts: " + ex.Message);
+                    System.Diagnostics.Debug.WriteLine("Error loading more community posts: " + ex.Message);
+                }
+            }
+        }
+
+
+
+        private void CommunityScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                double threshold = scrollViewer.ScrollableHeight * 0.2;
+                if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - threshold)
+                {
+                    LoadMoreCommunityPosts();
                 }
             }
         }
@@ -177,7 +328,7 @@ namespace ValleyTube
         public string ViewCountText { get; set; }
         public List<ImageObject> videoThumbnails { get; set; }
         public int LengthSeconds { get; set; }
-
+        public string continuation { get; set; }
 
         public string ThumbnailUrl
         {
@@ -223,11 +374,13 @@ namespace ValleyTube
     {
         public string authorId { get; set; }
         public List<ChannelComment> comments { get; set; }
+        public string continuation { get; set; }
     }
 
     public class ChannelComment
     {
         public string attachmentType { get; set; }
+
 
         [JsonIgnore] 
         public AttachmentBase attachment { get; set; }
@@ -310,6 +463,7 @@ namespace ValleyTube
     public class VideoResponse
     {
         public List<VideoObjectAgain> videos { get; set; }
+        public string continuation { get; set; }
     }
 
 

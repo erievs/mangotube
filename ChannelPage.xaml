@@ -31,7 +31,7 @@
             </PivotItem>
 
             <PivotItem Header="videos">
-                <ScrollViewer>
+                <ScrollViewer ViewChanged="ScrollViewer_ViewChanged">
                     <ListView x:Name="VideosListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -57,8 +57,9 @@
                 </ScrollViewer>
             </PivotItem>
 
+
             <PivotItem Header="community">
-                <ScrollViewer>
+               <ScrollViewer ViewChanged="CommunityScrollViewer_ViewChanged">
                     <ListView x:Name="CommunityListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -71,6 +72,7 @@
                                     
                                     <TextBlock Text="{Binding content}" FontSize="14" Foreground="Gray" Margin="0,0,15,0" TextWrapping="Wrap"/>
 
+                                 
 
                                     <TextBlock Text="" FontSize="14" Foreground="Gray" Margin="0,0,15,0" TextWrapping="Wrap"/>
 

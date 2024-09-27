@@ -4,4 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ValleyTube">
 
-</Application>
+    <Application.Resources>
+        <local:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
+        <local:StringToImageSourceConverter x:Key="StringToImageSourceConverter"/>
+        <local:ChannelTypeToVisibilityConverter x:Key="ChannelTypeToVisibilityConverter"/>
+        <local:ChannelTypeToVisibilityConverterOppsite x:Key="ChannelTypeToVisibilityConverterOppsite"/>
+    </Application.Resources>
+
+</Application> 

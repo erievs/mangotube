@@ -12,6 +12,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Media;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace ValleyTube
 {
@@ -328,6 +331,13 @@ namespace ValleyTube
                         {
                             _searchResults.Add(video);
                         }
+
+                        // Check for channel type
+                        if (video.Type == "channel")
+                        {
+                            System.Diagnostics.Debug.WriteLine("Channel found: " + video.AuthorId);
+                            _searchResults.Add(video);
+                        }
                     }
 
                     if (page == 1)
@@ -364,7 +374,7 @@ namespace ValleyTube
 
             if (scrollViewer != null)
             {
-                // Check if we are near the bottom of the ListView
+   
                 if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
                 {
                     string query = SearchBox.Text.Trim();
@@ -644,9 +654,18 @@ namespace ValleyTube
 
                 if (video != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
-                    Frame.Navigate(typeof(VideoPage), video.VideoId);
-                    SaveHistory(video);
+                    if (!string.IsNullOrEmpty(video.AuthorId))
+                    {
+                        System.Diagnostics.Debug.WriteLine("Navigating to channel with Author ID: " + video.AuthorId);
+                        Frame.Navigate(typeof(ChannelPage), video.AuthorId);
+                    }
+                    else
+                    {         
+                        System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
+                        Frame.Navigate(typeof(VideoPage), video.VideoId);
+                        SaveHistory(video);
+                    }
+      
                 }
             }
         }
@@ -728,21 +747,104 @@ namespace ValleyTube
         {
             get
             {
+                if (LengthSeconds < 0)
+                {
+                    return null; 
+                }
+
                 TimeSpan timeSpan = TimeSpan.FromSeconds(LengthSeconds);
 
                 if (timeSpan.TotalMinutes < 100)
                 {
-
                     return timeSpan.ToString(@"mm\:ss");
                 }
                 else
                 {
-
                     return timeSpan.ToString(@"hh\:mm\:ss");
                 }
             }
         }
 
+    }
+
+    public class NullOrEmptyToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+
+            if (value != null && value is string)
+            {
+                string str = (string)value;
+
+                return string.IsNullOrEmpty(str) ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class ChannelTypeToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+
+            if (value is string && (string)value == "channel")
+            {
+                return Visibility.Collapsed;
+            }
+
+            return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class ChannelTypeToVisibilityConverterOppsite : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+
+            if (value is string && (string)value == "channel")
+            {
+                return Visibility.Visible;
+            }
+
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class StringToImageSourceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+
+            if (value is string && !string.IsNullOrEmpty(value.ToString()))
+            {
+
+                return new BitmapImage(new Uri($"https:{value}", UriKind.Absolute));
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class VideoFormat
@@ -771,22 +873,69 @@ namespace ValleyTube
         public int Height { get; set; }
     }
 
+    public class AuthorThumbnail
+    {
+        public string Url { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
+
     public class VideoResult
     {
         public string VideoId { get; set; }
         public string Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
-        public string authorId { get; set; }
         public string Description { get; set; }
         public string ViewCountText { get; set; }
         public string PublishedText { get; set; }
+        public string Type { get; set; }
+
         public Thumbnail Thumbnail { get; set; }
         public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
+
+        public List<AuthorThumbnail> AuthorThumbnails { get; set; } = new List<AuthorThumbnail>();
+
+        public string FirstAuthorThumbnailUrl
+        {
+            get
+            {
+                return AuthorThumbnails.Count > 0 ? AuthorThumbnails[0].Url : null;
+            }
+        }
+
+
+        public bool IsChannel => Type == "channel";
+
         public bool IsFavorite { get; set; }
         public long Published { get; set; }
         public string AuthorId { get; set; }
         public int LengthSeconds { get; set; }
+        public int SubCount { get; set; }
+        public string ChannelHandle { get; set; }
+
+        public string FormattedSubCount
+        {
+            get
+            {
+
+                if (SubCount >= 1000000)
+                {
+                    double millionCount = SubCount / 1000000.0;
+                    return String.Format("{0:0.#}m Subscribers", millionCount);
+                }
+                else if (SubCount >= 1000)
+                {
+                    double thousandCount = SubCount / 1000.0;
+                    return String.Format("{0:0.#}k Subscribers", thousandCount);
+                }
+                else
+                {
+                    return String.Format("{0} Subscribers", SubCount);
+                }
+            }
+        }
 
         public string LengthFormatted
         {
@@ -808,6 +957,7 @@ namespace ValleyTube
         }
 
     }
+
 
     public class Channel
     {
@@ -832,4 +982,6 @@ namespace ValleyTube
         public int Width { get; set; }
         public int Height { get; set; }
     }
+
+
 }

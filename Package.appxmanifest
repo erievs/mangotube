@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="af7cce9f-1383-4bd3-8082-368b21c74c08" Publisher="CN=Nicholas Bryan Brook" Version="1.0.0.17" />
+  <Identity Name="af7cce9f-1383-4bd3-8082-368b21c74c08" Publisher="CN=Nicholas Bryan Brook" Version="1.0.0.19" />
   <mp:PhoneIdentity PhoneProductId="af7cce9f-1383-4bd3-8082-368b21c74c08" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>ValleyTube</DisplayName>
