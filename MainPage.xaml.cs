@@ -41,8 +41,11 @@ namespace ValleyTube
             InvidiousInstanceTextBox.Text = Settings.InvidiousInstance;
             InvidiousInstanceCommentsTextBox.Text = Settings.InvidiousInstanceComments;
             ReturnDislikesTextBox.Text = Settings.ReturnDislikeInstance;
+            SponserblockTextBox.Text = Settings.SponserBlockInstance;
             TimeoffToggleSwitch.IsOn = Settings.ScreenTimeOut;
             AutoplayToggleSwitch.IsOn = Settings.IsAutoplayEnabled;
+            SponserblockSwitch.IsOn = Settings.isSponserBlock;
+            DoulbeTapToSkipkSwitchUggh.IsOn = Settings.doubleTapToSkip;
 
             System.Diagnostics.Debug.WriteLine(Settings.ScreenTimeOut);
 
@@ -523,7 +526,7 @@ namespace ValleyTube
             AddVideoToHistory(videoResult);
         }
 
-        private static void AddVideoToHistory(VideoResult video)
+        public static void AddVideoToHistory(VideoResult video)
         {
 
             if (_videoHistory.Count >= Settings.MaxHistorySize)
@@ -630,6 +633,27 @@ namespace ValleyTube
             }
         }
 
+        private void Sponserblock_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                Settings.isSponserBlock = toggleSwitch.IsOn;
+                InitializeDisplayRequest();
+            }
+        }
+
+
+        private void DoulbeTapToSkip_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                Settings.doubleTapToSkip = toggleSwitch.IsOn;
+                InitializeDisplayRequest();
+            }
+        }
+
         private void SetInvidiousInstanceButton_Click(object sender, RoutedEventArgs e)
         {
             Settings.InvidiousInstance = InvidiousInstanceTextBox.Text;
@@ -645,6 +669,11 @@ namespace ValleyTube
             Settings.ReturnDislikeInstance = ReturnDislikesTextBox.Text;
         }
 
+        private void SetSponserblockTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.SponserBlockInstance = SponserblockTextBox.Text;
+        }
+
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
@@ -654,7 +683,7 @@ namespace ValleyTube
 
                 if (video != null)
                 {
-                    if (!string.IsNullOrEmpty(video.AuthorId))
+                    if (!string.IsNullOrEmpty(video.AuthorId) && video.Type == "channel")
                     {
                         System.Diagnostics.Debug.WriteLine("Navigating to channel with Author ID: " + video.AuthorId);
                         Frame.Navigate(typeof(ChannelPage), video.AuthorId);
@@ -662,8 +691,8 @@ namespace ValleyTube
                     else
                     {         
                         System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
-                        Frame.Navigate(typeof(VideoPage), video.VideoId);
                         SaveHistory(video);
+                        Frame.Navigate(typeof(VideoPage), video.VideoId);
                     }
       
                 }
@@ -716,6 +745,11 @@ namespace ValleyTube
 
                 System.Diagnostics.Debug.WriteLine("ComboBox is null.");
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

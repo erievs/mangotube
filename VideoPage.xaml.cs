@@ -11,6 +11,9 @@ using Windows.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
 using Windows.UI.Notifications;
 using System.IO;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes; 
+using Windows.UI.Xaml.Controls; 
 
 namespace ValleyTube
 {
@@ -22,6 +25,7 @@ namespace ValleyTube
         private DispatcherTimer syncTimer;
         private bool isSyncing = false;
         private VideoResult nextVideo;
+        private List<SponsorBlockSegment> sponsorSegments;
 
         public VideoPage()
         {
@@ -34,35 +38,27 @@ namespace ValleyTube
         private void InitializeSyncTimer()
         {
             syncTimer = new DispatcherTimer();
-            syncTimer.Interval = TimeSpan.FromMilliseconds(100);
+            syncTimer.Interval = TimeSpan.FromMilliseconds(200);
             syncTimer.Tick += SyncTimer_Tick;
         }
 
-
         private void SyncTimer_Tick(object sender, object e)
         {
-            if (VideoPlayer.CurrentState == MediaElementState.Playing && AudioPlayer.Source != null)
-            {
-                TimeSpan videoPosition = VideoPlayer.Position;
-                TimeSpan audioPosition = AudioPlayer.Position;
 
-                TimeSpan threshold = TimeSpan.FromMilliseconds(200);
-
-                if (Math.Abs((videoPosition - audioPosition).TotalMilliseconds) > threshold.TotalMilliseconds)
-                {
-                    AudioPlayer.Position = videoPosition;
-
-                    System.Diagnostics.Debug.WriteLine(
-                        String.Format("Sync correction applied. Video Position: {0}, Audio Position: {1}",
-                        videoPosition,
-                        audioPosition)
-                    );
-                }
+            if (AudioPlayer.Source != null) { 
+                SyncAudioWithVideo();
             }
-        }
-    
 
-    protected override async void OnNavigatedTo(NavigationEventArgs e)
+
+            if (Settings.isSponserBlock)
+            {
+                SkipSponsorSegments();
+            }
+
+        }
+
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
@@ -71,6 +67,7 @@ namespace ValleyTube
             {
                 videoId = parameter;
                 System.Diagnostics.Debug.WriteLine("Navigated to VideoPage with videoId: " + videoId);
+
 
                 LoadLikesDislikesData(videoId);
                 await LoadVideoDetails();
@@ -134,6 +131,31 @@ namespace ValleyTube
             }
         }
 
+        private async Task<List<SponsorBlockSegment>> GetSponsorSegments(string videoId)
+        {
+            string sponsorBlockUrl = Settings.SponserBlockInstance + "/api/skipSegments?videoID=" + videoId;
+
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    var response = await httpClient.GetStringAsync(sponsorBlockUrl);
+                    var segments = JsonConvert.DeserializeObject<List<SponsorBlockSegment>>(response);    
+                    foreach (var segment in segments)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"SponsorBlock Segment: Start - {segment.Segment[0]}, End - {segment.Segment[1]}, Category - {segment.Category}");
+                    }
+
+                    return segments;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error fetching SponsorBlock segments: " + ex.Message);
+                    return new List<SponsorBlockSegment>();
+                }
+            }
+        }
+
         private async Task LoadVideoDetails()
         {
             string videoUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
@@ -152,7 +174,10 @@ namespace ValleyTube
                     Uri audioUri = null;
 
                     var selectedQuality = Settings.SelectedQuality;
-                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality); 
+                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality);
+
+
+                    sponsorSegments = await GetSponsorSegments(videoId);
 
                     if (selectedQuality == "360p-direct")
                     {
@@ -208,80 +233,112 @@ namespace ValleyTube
             }
         }
 
+        public class QualityRange
+        {
+            public int MinQuality { get; set; }
+            public int MaxQuality { get; set; }
+
+            public QualityRange(int min, int max)
+            {
+                MinQuality = min;
+                MaxQuality = max;
+            }
+        }
+
         private Uri GetBestVideoUri(IEnumerable<VideoFormat> formats, string selectedQuality, out Uri audioUri)
         {
             audioUri = null;
 
-            if (formats != null && formats.Any())
+            if (formats == null)
             {
-                var bestFormat = formats
-                     .Where(f => f.encoding == "h264" && f.qualityLabel.Contains(selectedQuality))
-                    .OrderByDescending(f => ParseQuality(f.qualityLabel))
-                    .FirstOrDefault();
+                System.Diagnostics.Debug.WriteLine("No video formats available.");
+                return null;
+            }
 
-                if (bestFormat != null)
+            var qualityRanges = new Dictionary<string, QualityRange>();
+            qualityRanges.Add("144", new QualityRange(100, 199));
+            qualityRanges.Add("240", new QualityRange(200, 299));
+            qualityRanges.Add("360", new QualityRange(300, 399));
+            qualityRanges.Add("480", new QualityRange(400, 599));
+            qualityRanges.Add("720", new QualityRange(600, 799));
+            qualityRanges.Add("1080", new QualityRange(800, 1100));
+
+            if (!qualityRanges.ContainsKey(selectedQuality))
+            {
+                System.Diagnostics.Debug.WriteLine("Selected quality '" + selectedQuality + "' is not defined in quality ranges.");
+                return null;
+            }
+
+            int minQuality = qualityRanges[selectedQuality].MinQuality;
+            int maxQuality = qualityRanges[selectedQuality].MaxQuality;
+
+            VideoFormat bestFormat = null;
+
+            foreach (VideoFormat format in formats)
+            {
+                if (format.encoding == "h264")
                 {
-                    System.Diagnostics.Debug.WriteLine("Selected video quality: " + bestFormat.qualityLabel);
-                    System.Diagnostics.Debug.WriteLine("Selected video itag: " + bestFormat.itag);
-                    var videoUri = new Uri(bestFormat.url);
-
-                    var audioFormat = formats.FirstOrDefault(f => f.itag == "140");
-                    if (audioFormat != null)
+                    int quality = ParseQuality(format.qualityLabel);
+                    if (quality >= minQuality && quality <= maxQuality)
                     {
-                        audioUri = new Uri(audioFormat.url);
-                        System.Diagnostics.Debug.WriteLine("Selected audio track URL: " + audioUri.AbsoluteUri);
+                        if (bestFormat == null || ParseQuality(format.qualityLabel) > ParseQuality(bestFormat.qualityLabel))
+                        {
+                            bestFormat = format;
+                        }
                     }
-
-                    return videoUri;
                 }
+            }
+
+            if (bestFormat != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Selected video quality: " + bestFormat.qualityLabel);
+                System.Diagnostics.Debug.WriteLine("Selected video itag: " + bestFormat.itag);
+                var videoUri = new Uri(bestFormat.url);
+
+                foreach (VideoFormat format in formats)
+                {
+                    if (format.itag == "140")
+                    {
+                        audioUri = new Uri(format.url);
+                        System.Diagnostics.Debug.WriteLine("Selected audio track URL: " + audioUri.AbsoluteUri);
+                        break;
+                    }
+                }
+
+                return videoUri;
             }
 
             System.Diagnostics.Debug.WriteLine("No suitable video format found.");
             return null;
         }
 
-        private int GetBitrate(string bitrateLabel)
+        private bool IsQualityInRange(string qualityLabel, int minQuality, int maxQuality)
         {
-            if (string.IsNullOrEmpty(bitrateLabel))
-            {
-                return 0;
-            }
-
-            int bitrate;
-            if (int.TryParse(bitrateLabel, out bitrate))
-            {
-                return bitrate;
-            }
-
-            return 0;
+            int parsedQuality = ParseQuality(qualityLabel);
+            return parsedQuality >= minQuality && parsedQuality <= maxQuality;
         }
 
         private int ParseQuality(string qualityLabel)
         {
-            if (string.IsNullOrEmpty(qualityLabel))
-            {
-                return 0;
-            }
 
             if (qualityLabel.EndsWith("p"))
             {
-                string numericPart = qualityLabel.Replace("p", "");
+                qualityLabel = qualityLabel.Substring(0, qualityLabel.Length - 1);
+            }
 
-                int quality;
-                if (int.TryParse(numericPart, out quality))
+            string numericPart = "";
+            foreach (char c in qualityLabel)
+            {
+                if (char.IsDigit(c))
                 {
-                    return quality;
+                    numericPart += c;
                 }
             }
 
-            if (string.Equals(qualityLabel, "HD", StringComparison.OrdinalIgnoreCase))
+            int quality;
+            if (int.TryParse(numericPart, out quality))
             {
-                return 1080;
-            }
-
-            if (string.Equals(qualityLabel, "SD", StringComparison.OrdinalIgnoreCase))
-            {
-                return 480;
+                return quality;
             }
 
             return 0;
@@ -424,33 +481,106 @@ namespace ValleyTube
             }
         }
 
+        private async void SkipSponsorSegments()
+        {
+            if (sponsorSegments == null || !sponsorSegments.Any())
+            {
+                SponsorSkipMessageTextBlock.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var currentPosition = VideoPlayer.Position.TotalSeconds;
+            int skippedSegmentsCount = 0;
+
+            foreach (var segment in sponsorSegments)
+            {
+                if (currentPosition >= segment.Segment[0] && currentPosition <= segment.Segment[1])
+                {
+                    TimeSpan skipToTime = TimeSpan.FromSeconds(segment.Segment[1]);
+
+                    System.Diagnostics.Debug.WriteLine($"Skipping sponsor segment from {segment.Segment[0]} to {segment.Segment[1]}");
+
+                    VideoPlayer.Position = skipToTime;
+
+                    if (AudioPlayer.Source != null)
+                    {
+                        AudioPlayer.Position = skipToTime;
+                    }
+
+                    skippedSegmentsCount++;
+
+                    SponsorSkipMessageTextBlock.Text = $"Skipped sponsor segment!";
+                    SponsorSkipMessageTextBlock.Visibility = Visibility.Visible;
+
+                    await Task.Delay(5000);
+
+                    SponsorSkipMessageTextBlock.Visibility = Visibility.Collapsed;
+
+                    break;
+                }
+            }
+        }
+
         // ultra high tech code to make the audio and video player sync up somtimes
 
-        private async void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
+        private void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
         {
+
             if (isSyncing) return;
 
             isSyncing = true;
-            switch (VideoPlayer.CurrentState)
+            try
             {
-                case MediaElementState.Playing:
-                    if (AudioPlayer.Source != null)
-                    {
-                        AudioPlayer.Position = VideoPlayer.Position;
-                        AudioPlayer.Play();
-                    }
-                    break;
+                switch (VideoPlayer.CurrentState)
+                {
+                    case MediaElementState.Playing:
+                        if (!syncTimer.IsEnabled)
+                        {
+                            syncTimer.Start();
+                        }
 
-                case MediaElementState.Paused:
-                    AudioPlayer.Pause();
-                    break;
+                        break;
 
-                case MediaElementState.Stopped:
-                    AudioPlayer.Stop();
-                    break;
+                    case MediaElementState.Paused:
+                        syncTimer.Stop();
+                        if (AudioPlayer.CurrentState == MediaElementState.Playing)
+                        {
+                            AudioPlayer.Pause();
+                        }
+                        break;
+
+                    case MediaElementState.Stopped:
+                        syncTimer.Stop();
+                        AudioPlayer.Stop();
+                        break;
+                }
+            }
+            finally
+            {
+                isSyncing = false;
+            }
+        }
+
+        private void SyncAudioWithVideo()
+        {
+            if (AudioPlayer.Source == null)
+            {
+                return;
             }
 
-            isSyncing = false;
+            double positionDifference = Math.Abs((VideoPlayer.Position - AudioPlayer.Position).TotalSeconds);
+
+            if (positionDifference > 0.5)
+            {
+                AudioPlayer.Position = VideoPlayer.Position;
+                System.Diagnostics.Debug.WriteLine($"Sync correction applied. Audio Player position adjusted to {AudioPlayer.Position} to match Video Player.");
+            }
+
+            if (AudioPlayer.CurrentState != MediaElementState.Playing)
+            {
+                AudioPlayer.Play();
+                System.Diagnostics.Debug.WriteLine("Audio Player started playing.");
+            }
         }
 
         private async Task DownloadVideo(string videoId)
@@ -557,7 +687,10 @@ namespace ValleyTube
 
         private void VideoPlayer_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
-            GoToNextVideo();
+            if (Settings.doubleTapToSkip)
+            {
+                GoToNextVideo();
+            }
         }
 
         private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
@@ -753,6 +886,34 @@ public class Comment
     public string content { get; set; }
     public string continuation { get; set; }
 }
+
+public class SponsorBlockSegment
+{
+    [JsonProperty("category")]
+    public string Category { get; set; }  
+
+    [JsonProperty("actionType")]
+    public string ActionType { get; set; } 
+
+    [JsonProperty("segment")]
+    public List<double> Segment { get; set; }
+
+    [JsonProperty("UUID")]
+    public string UUID { get; set; } 
+
+    [JsonProperty("videoDuration")]
+    public double VideoDuration { get; set; } 
+
+    [JsonProperty("locked")]
+    public int Locked { get; set; } 
+
+    [JsonProperty("votes")]
+    public int Votes { get; set; }  
+
+    [JsonProperty("description")]
+    public string Description { get; set; } 
+}
+
 
 public class AuthorThumbnail
 {

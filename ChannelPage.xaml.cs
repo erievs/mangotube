@@ -12,6 +12,11 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Controls;
 
 namespace ValleyTube
 {
@@ -26,6 +31,8 @@ namespace ValleyTube
         public ChannelPage()
         {
             this.InitializeComponent();
+            SubscriptionManager.LoadSubscriptions();
+
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -53,6 +60,40 @@ namespace ValleyTube
             await LoadCommunityPosts();
         }
 
+        private void InitializeSubscriptionButton(String channelId)
+        {
+            try
+            {
+
+                System.Diagnostics.Debug.WriteLine("channeId is " + channelId);
+
+     
+
+                System.Diagnostics.Debug.WriteLine("Retrieved authorId is " + channelId);
+
+                if (!string.IsNullOrEmpty(channelId))
+                {
+                    if (SubscriptionManager.IsSubscribed(channelId))
+                    {
+                        SubscribeButton.Content = "Unsubscribe";
+                    }
+                    else
+                    {
+                        SubscribeButton.Content = "Subscribe";
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to retrieve authorId.");
+                    SubscribeButton.Content = "Subscribe";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error in InitializeSubscriptionButton: " + ex.Message);
+            }
+        }
+
         private async Task LoadChannelDetails()
         {
             string channelUrl = $"{Settings.InvidiousInstance}/api/v1/channels/{channelId}";
@@ -69,8 +110,11 @@ namespace ValleyTube
                         ChannelTitle.Text = channelData.author;
                         ChannelDescription.Text = channelData.description;
                         var bannerUrl = channelData.authorBanners.FirstOrDefault()?.Url ?? string.Empty;
-                        ChannelBanner.Source = new BitmapImage(new Uri(bannerUrl));
+
+                        SetBackgroundImage(bannerUrl);
+
                         ChannelStatsTextBlock.Text = $"Subscribers: {channelData.subCount}\nTotal Views: {channelData.totalViews}";
+                        InitializeSubscriptionButton(channelId);
                     }
                 }
                 catch (Exception ex)
@@ -78,6 +122,14 @@ namespace ValleyTube
                     System.Diagnostics.Debug.WriteLine("Error loading channel details: " + ex.Message);
                 }
             }
+        }
+
+        private void SetBackgroundImage(string bannerUrl)
+        {
+
+            var bitmapImage = new BitmapImage(new Uri(bannerUrl));
+
+            BackgroundImage.Source = bitmapImage;
         }
 
         private async Task LoadChannelVideos()
@@ -123,6 +175,32 @@ namespace ValleyTube
                 {
                     System.Diagnostics.Debug.WriteLine("Error loading videos: " + ex.Message);
                 }
+            }
+        }
+
+        private void SubscribeButton_Click(object sender, RoutedEventArgs e)
+        {
+         
+            if (channelId != null)
+            {
+                if (SubscriptionManager.IsSubscribed(channelId))
+                {
+
+                    SubscriptionManager.Unsubscribe(channelId);
+                    SubscribeButton.Content = "Subscribe";
+                    SubscriptionManager.SaveSubscriptions();
+                }
+                else
+                {
+
+                    SubscriptionManager.Subscribe(channelId);
+                    SubscribeButton.Content = "Unsubscribe";
+                    SubscriptionManager.SaveSubscriptions();
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Failed to get channelId.");
             }
         }
 
@@ -279,7 +357,27 @@ namespace ValleyTube
             }
         }
 
+        public static void SaveHistoryVideoObject(VideoObjectAgain video)
+        {
 
+            var videoResult = new VideoResult
+            {
+                VideoId = video.videoId,
+                Title = video.Title,
+                Author = video.Author,
+
+
+                VideoThumbnails = new List<VideoThumbnail>
+        {
+            new VideoThumbnail
+            {
+                Url = video.ThumbnailUrl
+            }
+        }
+            };
+
+            MainPage.AddVideoToHistory(videoResult);
+        }
 
         private void CommunityScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
@@ -307,6 +405,7 @@ namespace ValleyTube
 
             if (video != null)
             {
+                SaveHistoryVideoObject(video);
                 Frame.Navigate(typeof(VideoPage), video.videoId);
             }
 

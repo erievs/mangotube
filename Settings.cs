@@ -6,15 +6,18 @@ namespace ValleyTube
     public static class Settings
     {
         private static bool _isDash;
+        private static bool _isSponserBlock;
         private static bool _isAutoplayEnabled;
         public static string _selectedQuality;
         private static bool _screenTimeOut;
+        private static bool _doubleTapToSkip;
 
         private static string _invidiousInstance = "https://inv.nadeko.net";
         private static string _invidiousInstanceComments = "https://inv.nadeko.net";
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
+        private static string _SponserBlockInstance = "https://sponsor.ajay.app";
 
-        public const int MaxHistorySize = 200;
+        public const int MaxHistorySize = 500;
 
         public static bool isDash
         {
@@ -23,6 +26,26 @@ namespace ValleyTube
             {
                 _isDash = value;
                 SaveSetting("isDash", value);
+            }
+        }
+
+        public static bool isSponserBlock
+        {
+            get { return _isSponserBlock; }
+            set
+          {
+                _isSponserBlock = value;
+                SaveSetting("isSponserBlock", value);
+            }  
+        }
+
+        public static bool doubleTapToSkip
+        {
+            get { return _doubleTapToSkip; }
+            set
+            {
+                _doubleTapToSkip = value;
+                SaveSetting("doubleTapToSkip", value);
             }
         }
 
@@ -86,6 +109,16 @@ namespace ValleyTube
             }
         }
 
+        public static string SponserBlockInstance
+        {
+            get { return _SponserBlockInstance; }
+            set
+            {
+                _SponserBlockInstance = value;
+                SaveSetting("SponserBlockInstance", value);
+            }
+        }
+
         public static void SaveSetting(string key, object value)
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -123,9 +156,24 @@ namespace ValleyTube
                 _selectedQuality = (string)localSettings.Values["SelectedQuality"];
             }
 
+            if (localSettings.Values.ContainsKey("isSponserBlock"))
+            {
+                _isSponserBlock = (bool)localSettings.Values["isSponserBlock"];
+            }
+
+            if (localSettings.Values.ContainsKey("doubleTapToSkip"))
+            {
+                _doubleTapToSkip = (bool)localSettings.Values["doubleTapToSkip"];
+            }
+            
             if (localSettings.Values.ContainsKey("InvidiousInstance"))
             {
                 _invidiousInstance = (string)localSettings.Values["InvidiousInstance"];
+            }
+
+            if (localSettings.Values.ContainsKey("SponserBlockInstance"))
+            {
+                _SponserBlockInstance = (string)localSettings.Values["SponserBlockInstance"];
             }
 
             if (localSettings.Values.ContainsKey("InvidiousInstanceComments"))

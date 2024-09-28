@@ -8,83 +8,79 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid x:Name="MainGrid">
+  
+        <Grid x:Name="BackgroundGrid">
+            <Image x:Name="BackgroundImage" Stretch="UniformToFill"/>
+            <Rectangle Fill="Black" Opacity="0.7" IsHitTestVisible="False"/>
+        </Grid>
 
-        <Pivot Grid.Row="1" Margin="0,10,0,0">
+        <Grid x:Name="ContentGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <PivotItem Header="details">
-                <ScrollViewer>
-                    <StackPanel>
-                        <Image x:Name="ChannelBanner" Stretch="Fill" Height="200" Margin="0,0,0,10"/>
-
-                        <StackPanel Margin="10">
-                            <TextBlock x:Name="ChannelTitle" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                            <TextBlock x:Name="ChannelDescription" TextWrapping="Wrap" FontSize="16" Foreground="White" Margin="0,10,0,0"/>
-                            <TextBlock x:Name="ChannelStatsTextBlock" FontSize="16" Foreground="White"/>
+            <Pivot Grid.Row="1" Margin="0,10,0,0">
+                <PivotItem Header="details">
+                    <ScrollViewer>
+                        <StackPanel>
+                            <StackPanel Margin="10">
+                                <TextBlock x:Name="ChannelTitle" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                                <Button x:Name="SubscribeButton" Content="Subscribe" Click="SubscribeButton_Click"
+                                        HorizontalAlignment="Left" Margin="5" Background="#C8102E" 
+                                        Foreground="White" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="ChannelDescription" TextWrapping="Wrap" FontSize="16" Foreground="White" Margin="0,10,0,0"/>
+                                <TextBlock x:Name="ChannelStatsTextBlock" FontSize="16" Foreground="White"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </PivotItem>
-
-            <PivotItem Header="videos">
-                <ScrollViewer ViewChanged="ScrollViewer_ViewChanged">
-                    <ListView x:Name="VideosListView">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
-                                        <Grid>
-                                            <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                            <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
-                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
-                                            </Border>
-                                        </Grid>
-                                    </Button>
-                                    <StackPanel Orientation="Vertical">
-                                        <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                        <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
-                                        <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
-                                        <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                    </ScrollViewer>
+                </PivotItem>
+                <PivotItem Header="videos">
+                    <ScrollViewer ViewChanged="ScrollViewer_ViewChanged">
+                        <ListView x:Name="VideosListView">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
+                                            <Grid>
+                                                <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                                <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                                    <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                                </Border>
+                                            </Grid>
+                                        </Button>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                            <TextBlock Text="{Binding Author}" FontSize="14" Foreground="LightGray"/>
+                                            <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="LightGray"/>
+                                            <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="LightGray"/>
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollViewer>
-            </PivotItem>
-
-
-            <PivotItem Header="community">
-               <ScrollViewer ViewChanged="CommunityScrollViewer_ViewChanged">
-                    <ListView x:Name="CommunityListView">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" Margin="0">
-                                    
-                                    <TextBlock Text="{Binding author}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                    <TextBlock Text="{Binding publishedText}" FontSize="14" Foreground="Gray" Margin="0,0,0,0"/>
-                                    
-                                    <TextBlock Text="" FontSize="14" Foreground="Gray" Margin="0,0,15,0" TextWrapping="Wrap"/>
-                                    
-                                    <TextBlock Text="{Binding content}" FontSize="14" Foreground="Gray" Margin="0,0,15,0" TextWrapping="Wrap"/>
-
-                                 
-
-                                    <TextBlock Text="" FontSize="14" Foreground="Gray" Margin="0,0,15,0" TextWrapping="Wrap"/>
-
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollViewer>
-            </PivotItem>
-
-
-        </Pivot>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+                </PivotItem>
+                <PivotItem Header="community">
+                    <ScrollViewer ViewChanged="CommunityScrollViewer_ViewChanged">
+                        <ListView x:Name="CommunityListView">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" Margin="0">
+                                        <TextBlock Text="{Binding author}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="{Binding publishedText}" FontSize="14" Foreground="LightGray" Margin="0,0,0,0"/>
+                                        <TextBlock Text="" FontSize="14" Foreground="LightGray" Margin="0,0,15,0" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding content}" FontSize="14" Foreground="LightGray" Margin="0,0,15,0" TextWrapping="Wrap"/>
+                                        <TextBlock Text="" FontSize="14" Foreground="LightGray" Margin="0,0,15,0" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+                </PivotItem>
+            </Pivot>
+        </Grid>
     </Grid>
 
     <Page.BottomAppBar>
@@ -92,5 +88,4 @@
             <AppBarButton Icon="Back" Label="Back" Click="BackButton_Click"/>
         </CommandBar>
     </Page.BottomAppBar>
-
 </Page>
