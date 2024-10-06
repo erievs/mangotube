@@ -9,14 +9,7 @@ using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Shapes;
-using Windows.UI.Xaml.Controls;
+
 
 namespace ValleyTube
 {
@@ -35,7 +28,7 @@ namespace ValleyTube
 
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
@@ -43,12 +36,12 @@ namespace ValleyTube
             if (parameter != null)
             {
                 channelId = parameter;
-                LoadChannelData(); 
+                await LoadChannelData();
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("Error: Parameter is not a valid string.");
-        
+
             }
         }
 

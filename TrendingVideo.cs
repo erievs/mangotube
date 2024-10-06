@@ -61,8 +61,9 @@ namespace ValleyTube
         {
             get
             {
-                return ViewCount.ToString() + " views";
+                return Utils.ConvertViewsToShortFormat(ViewCount) + " views";
             }
         }
+
     }
 }

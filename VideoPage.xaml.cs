@@ -11,9 +11,14 @@ using Windows.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
 using Windows.UI.Notifications;
 using System.IO;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes; 
-using Windows.UI.Xaml.Controls; 
+using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Popups;
+using Windows.UI.StartScreen;
+using System.Diagnostics;
+using Windows.UI.Xaml.Documents;
+using System.Text.RegularExpressions;
+using Windows.UI.Xaml.Input;
+using Windows.UI;
 
 namespace ValleyTube
 {
@@ -45,10 +50,10 @@ namespace ValleyTube
         private void SyncTimer_Tick(object sender, object e)
         {
 
-            if (AudioPlayer.Source != null) { 
+            if (AudioPlayer.Source != null)
+            {
                 SyncAudioWithVideo();
             }
-
 
             if (Settings.isSponserBlock)
             {
@@ -56,7 +61,6 @@ namespace ValleyTube
             }
 
         }
-
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -68,11 +72,12 @@ namespace ValleyTube
                 videoId = parameter;
                 System.Diagnostics.Debug.WriteLine("Navigated to VideoPage with videoId: " + videoId);
 
-
                 LoadLikesDislikesData(videoId);
+                LoadComments();
+
                 await LoadVideoDetails();
                 await LoadRelatedVideos();
-                await LoadComments();
+
             }
             else
             {
@@ -104,7 +109,7 @@ namespace ValleyTube
                     var likes = (int)jsonData["likes"];
                     var dislikes = (int)jsonData["dislikes"];
 
-                    LikesTextBlock.Text = $"{likes:N0} Likes";
+                    LikesTextBlock.Text = $"{likes:N0} Likes - ";
                     DislikesTextBlock.Text = $"{dislikes:N0} Dislikes";
                 }
                 catch (HttpRequestException ex)
@@ -140,7 +145,7 @@ namespace ValleyTube
                 try
                 {
                     var response = await httpClient.GetStringAsync(sponsorBlockUrl);
-                    var segments = JsonConvert.DeserializeObject<List<SponsorBlockSegment>>(response);    
+                    var segments = JsonConvert.DeserializeObject<List<SponsorBlockSegment>>(response);
                     foreach (var segment in segments)
                     {
                         System.Diagnostics.Debug.WriteLine($"SponsorBlock Segment: Start - {segment.Segment[0]}, End - {segment.Segment[1]}, Category - {segment.Category}");
@@ -176,22 +181,38 @@ namespace ValleyTube
                     var selectedQuality = Settings.SelectedQuality;
                     System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality);
 
-
                     sponsorSegments = await GetSponsorSegments(videoId);
 
                     if (selectedQuality == "360p-direct")
                     {
                         string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", video.VideoId);
                         videoUri = new Uri(videoUrlString);
-                        System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri); 
+                        System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri);
+                    }
+
+                    else if (selectedQuality == "360p-format-stream")
+                    {
+
+                        var adaptiveFormat = video.formatStreams.FirstOrDefault(f => f.qualityLabel == "360p");
+
+                        if (adaptiveFormat != null)
+                        {
+                            videoUri = new Uri(adaptiveFormat.url);
+                            System.Diagnostics.Debug.WriteLine("Using Adaptive Video URL: " + videoUri.AbsoluteUri);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("No 360p-adaptive format found.");
+                        }
                     }
                     else
                     {
                         videoUri = GetBestVideoUri(video.adaptiveFormats, selectedQuality, out audioUri);
-                        System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found")); 
+                        System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found"));
+
                         if (audioUri != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri); 
+                            System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri);
                         }
                     }
 
@@ -215,14 +236,20 @@ namespace ValleyTube
                         AudioPlayer.Play();
                     }
 
-
                     long unixTimestamp = long.Parse(video.published);
-                    string formattedDate = Utils.ConvertUnixTimestampToRelativeTime(unixTimestamp);
+                    long views = long.Parse(video.viewCount);
 
+                    string formattedDate = Utils.ConvertUnixTimestampToRelativeTime(unixTimestamp);
+                    string formattedViews = Utils.AddCommasToNumber(views);
+                    string formattedTags = Utils.ConvertKeywordsToCommaSeparated(video.Keywords);
 
                     DateTextBlock.Text = formattedDate;
                     AuthorTextBlock.Text = video.author + "  -  ";
-                    DescriptionTextBlock.Text = video.Description;
+                    ViewTextBlock.Text = " - " + formattedViews + " views";
+
+                    SetDescriptionText(video.Description);
+                    GenreTextBlock.Text = "Genre: " + video.genre;
+                    TagsTextBlock.Text = "Tags: " + formattedTags;
 
                     InitializeSubscriptionButton(video.VideoId);
                 }
@@ -231,6 +258,57 @@ namespace ValleyTube
                     System.Diagnostics.Debug.WriteLine("Error loading video details: " + ex.Message);
                 }
             }
+        }
+
+        private void SetDescriptionText(string description)
+        {
+
+            DescriptionRichTextBlock.Blocks.Clear();
+
+            string urlPattern = @"(http|https)://[^\s]+";
+            MatchCollection matches = Regex.Matches(description, urlPattern);
+
+            var paragraph = new Paragraph();
+
+            int lastIndex = 0;
+            foreach (Match match in matches)
+            {
+
+                if (match.Index > lastIndex)
+                {
+                    var run = new Run();
+                    run.Text = description.Substring(lastIndex, match.Index - lastIndex);
+                    paragraph.Inlines.Add(run);
+                }
+
+                var hyperlink = new Hyperlink
+                {
+                    Foreground = new SolidColorBrush(Windows.UI.Colors.LightBlue)
+                };
+
+                var linkRun = new Run();
+                linkRun.Text = match.Value;
+                hyperlink.Inlines.Add(linkRun);
+
+                hyperlink.Click += (s, e) =>
+                {
+
+                    Windows.System.Launcher.LaunchUriAsync(new Uri(match.Value));
+                };
+
+                paragraph.Inlines.Add(hyperlink);
+
+                lastIndex = match.Index + match.Length;
+            }
+
+            if (lastIndex < description.Length)
+            {
+                var remainingRun = new Run();
+                remainingRun.Text = description.Substring(lastIndex);
+                paragraph.Inlines.Add(remainingRun);
+            }
+
+            DescriptionRichTextBlock.Blocks.Add(paragraph);
         }
 
         public class QualityRange
@@ -344,7 +422,7 @@ namespace ValleyTube
             return 0;
         }
 
-        private async Task LoadComments(string sortBy = "top", string source = "youtube")
+        private void LoadComments(string sortBy = "top", string source = "youtube")
         {
             string commentsUrl = Settings.InvidiousInstanceComments + "/api/v1/comments/" + videoId +
                                 "?sort_by=" + sortBy +
@@ -406,6 +484,29 @@ namespace ValleyTube
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine("Error loading comments: " + ex.Message);
+                }
+            }
+        }
+
+        private void CommentsScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"ScrollViewer VerticalOffset: {scrollViewer.VerticalOffset}");
+                System.Diagnostics.Debug.WriteLine($"ScrollViewer ScrollableHeight: {scrollViewer.ScrollableHeight}");
+
+                double threshold = scrollViewer.ScrollableHeight * 0.1;
+
+                if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - threshold)
+                {
+                    System.Diagnostics.Debug.WriteLine("Reached the threshold, loading more comments.");
+                    LoadComments();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Not close enough to the bottom to load more comments.");
                 }
             }
         }
@@ -509,19 +610,15 @@ namespace ValleyTube
 
                     skippedSegmentsCount++;
 
-                    SponsorSkipMessageTextBlock.Text = $"Skipped sponsor segment!";
-                    SponsorSkipMessageTextBlock.Visibility = Visibility.Visible;
-
-                    await Task.Delay(5000);
-
-                    SponsorSkipMessageTextBlock.Visibility = Visibility.Collapsed;
+                    if (Settings.showSponserSkipMessage)
+                    {
+                        ShowToastNotification("Skipped sponsor segment!");
+                    }
 
                     break;
                 }
             }
         }
-
-        // ultra high tech code to make the audio and video player sync up somtimes
 
         private void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
         {
@@ -594,9 +691,40 @@ namespace ValleyTube
                 var file = await storageFolder.CreateFileAsync(fileName, Windows.Storage.CreationCollisionOption.ReplaceExisting);
                 System.Diagnostics.Debug.WriteLine($"File created: {file.Path}");
 
-                string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", videoId);
-                var videoUri = new Uri(videoUrlString);
-                System.Diagnostics.Debug.WriteLine($"Video URL: {videoUri.AbsoluteUri}");
+                Uri videoUri = null;
+
+                bool useFormatStreamForDownloads = Settings.useFormatStreamForDownloads;
+
+                if (useFormatStreamForDownloads)
+                {
+
+                    string videoUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
+                    using (var httpClient = new HttpClient())
+                    {
+                        var response = await httpClient.GetStringAsync(videoUrl);
+                        var video = JsonConvert.DeserializeObject<VideoDetail>(response);
+
+                        var formatStream = video.formatStreams.FirstOrDefault(f => f.qualityLabel == "360p");
+
+                        if (formatStream != null)
+                        {
+                            videoUri = new Uri(formatStream.url);
+                            System.Diagnostics.Debug.WriteLine($"Using FormatStream URL: {videoUri.AbsoluteUri}");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("No 360p format found in formatStreams.");
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+
+                    string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", videoId);
+                    videoUri = new Uri(videoUrlString);
+                    System.Diagnostics.Debug.WriteLine($"Using Direct Video URL: {videoUri.AbsoluteUri}");
+                }
 
                 using (var httpClient = new HttpClient())
                 {
@@ -652,22 +780,31 @@ namespace ValleyTube
             }
         }
 
-        private void ShowToastNotification(string message)
+        private async void ShowToastNotification(string message)
         {
-            var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
-            var toastText = toastXml.GetElementsByTagName("text").FirstOrDefault();
-            toastText.InnerText = message;
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                try
+                {
+                    var dialog = new MessageDialog(message);
+                    await dialog.ShowAsync();
+                }
+                catch (UnauthorizedAccessException ex)
+                {
 
-            var toast = new ToastNotification(toastXml);
-            ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    Debug.WriteLine($"Access denied: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+
+                    Debug.WriteLine($"Error showing toast notification: {ex.Message}");
+                }
+            });
         }
-
-
-        // Buttons and stuff 
 
         private void AudioPlayer_MediaOpened(object sender, RoutedEventArgs e)
         {
-            // make it happy
+
             System.Diagnostics.Debug.WriteLine("AudioPlayer media opened.");
         }
 
@@ -681,7 +818,7 @@ namespace ValleyTube
 
         private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
         {
-            // make it happy
+
             System.Diagnostics.Debug.WriteLine("VideoPlayer media opened.");
         }
 
@@ -701,11 +838,20 @@ namespace ValleyTube
             }
         }
 
-        private async void LoadMoreComments_Click(object sender, RoutedEventArgs e)
+        private void OnResuming(object sender, object e)
+        {
+            if (VideoPlayer.Source != null)
+            {
+                SyncAudioWithVideo();
+                System.Diagnostics.Debug.WriteLine("App resumed, video playing resumed.");
+            }
+        }
+
+        private void LoadMoreComments_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(continuationToken))
             {
-                await LoadComments();
+                LoadComments();
             }
         }
 
@@ -725,7 +871,6 @@ namespace ValleyTube
             }
         }
 
-
         private async void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(videoId))
@@ -738,14 +883,11 @@ namespace ValleyTube
             }
         }
 
-
         private void AuthorButton_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Navigating to channel with ID: " + aurthorId);
             Frame.Navigate(typeof(ChannelPage), aurthorId);
         }
-
-
 
         private void Button_Click_1(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
@@ -848,24 +990,134 @@ namespace ValleyTube
             }
         }
 
-        // just to make it happy
+        private void ShareButton_Click(object sender, RoutedEventArgs e)
+        {
 
+            DataPackage dataPackage = new DataPackage();
+            string contentToShare = "Check out this awesome video!";
+
+            dataPackage.SetText(contentToShare);
+
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+
+            dataTransferManager.DataRequested += (s, args) =>
+            {
+
+                args.Request.Data = dataPackage;
+
+                args.Request.Data.Properties.Title = "Share Video";
+                args.Request.Data.Properties.Description = "Sharing a video link!";
+            };
+
+            DataTransferManager.ShowShareUI();
+        }
+
+        private async void PinButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                var dialog = new MessageDialog("Invalid video ID.");
+                await dialog.ShowAsync();
+                return;
+            }
+
+            VideoResult video = await FetchVideoDetailsAsync(videoId);
+            if (video == null)
+            {
+                var dialog = new MessageDialog("Failed to fetch video details.");
+                await dialog.ShowAsync();
+                return;
+            }
+
+            string tileId = "VideoTile_" + videoId;
+
+            string thumbnailUrl = string.Empty;
+            if (video.VideoThumbnails != null && video.VideoThumbnails.Count > 0)
+            {
+                thumbnailUrl = video.VideoThumbnails[0].Url;
+            }
+
+            if (string.IsNullOrEmpty(thumbnailUrl))
+            {
+                thumbnailUrl = "ms-appx:///Assets/Square150x150Logo.scale-240.png";
+            }
+
+            Uri thumbnailUri;
+            try
+            {
+                thumbnailUri = new Uri(thumbnailUrl);
+            }
+            catch (Exception ex)
+            {
+                var dialog = new MessageDialog($"Thumbnail URL is not valid: {ex.Message}");
+                await dialog.ShowAsync();
+                return;
+            }
+
+            var tile = new SecondaryTile(
+                tileId,
+                video.Title,
+                "Video ID: " + videoId,
+                new Uri($"ms-appx:///VideoPage.xaml?videoId={videoId}"),
+                TileSize.Default)
+            {
+                VisualElements =
+        {
+
+            Square150x150Logo = new Uri("ms-appx:///Assets/Square150x150Logo.scale-240.png"),
+            Wide310x150Logo = new Uri("ms-appx:///Assets/Wide310x150Logo.scale-240.png"),
+            BackgroundColor = Windows.UI.Colors.Blue,
+            ForegroundText = ForegroundText.Dark
+        }
+            };
+
+            bool isPinned = await tile.RequestCreateAsync();
+
+            if (isPinned)
+            {
+                var dialog = new MessageDialog("Video pinned to Start!");
+                await dialog.ShowAsync();
+            }
+            else
+            {
+                var dialog = new MessageDialog("Failed to pin the video.");
+                await dialog.ShowAsync();
+            }
+        }
+
+        private async Task<VideoResult> FetchVideoDetailsAsync(string videoId)
+        {
+            string apiUrl = Settings.InvidiousInstance + $"/api/v1/videos/{videoId}";
+
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    var response = await client.GetStringAsync(apiUrl);
+                    var video = JsonConvert.DeserializeObject<VideoResult>(response);
+                    return video;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error fetching video details: " + ex.Message);
+                    return null;
+                }
+            }
+        }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            // make it happy
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            // make it happy
+
         }
-
-
 
     }
 }
-
 
 public class CommentsResponse
 {
@@ -874,7 +1126,6 @@ public class CommentsResponse
     public List<Comment> comments { get; set; }
     public string continuation { get; set; }
 }
-
 
 public class Comment
 {
@@ -890,30 +1141,29 @@ public class Comment
 public class SponsorBlockSegment
 {
     [JsonProperty("category")]
-    public string Category { get; set; }  
+    public string Category { get; set; }
 
     [JsonProperty("actionType")]
-    public string ActionType { get; set; } 
+    public string ActionType { get; set; }
 
     [JsonProperty("segment")]
     public List<double> Segment { get; set; }
 
     [JsonProperty("UUID")]
-    public string UUID { get; set; } 
+    public string UUID { get; set; }
 
     [JsonProperty("videoDuration")]
-    public double VideoDuration { get; set; } 
+    public double VideoDuration { get; set; }
 
     [JsonProperty("locked")]
-    public int Locked { get; set; } 
+    public int Locked { get; set; }
 
     [JsonProperty("votes")]
-    public int Votes { get; set; }  
+    public int Votes { get; set; }
 
     [JsonProperty("description")]
-    public string Description { get; set; } 
+    public string Description { get; set; }
 }
-
 
 public class AuthorThumbnail
 {

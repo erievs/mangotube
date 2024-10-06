@@ -114,7 +114,7 @@ namespace ValleyTube
         }
 
 
-        protected override void OnActivated(IActivatedEventArgs args)
+        protected override async void OnActivated(IActivatedEventArgs args)
         {
             base.OnActivated(args);
 
@@ -127,7 +127,7 @@ namespace ValleyTube
 
                 if (mainPage != null)
                 {
-                    SubscriptionManager.ImportSubscriptionsFromCsv(file);
+                    await SubscriptionManager.ImportSubscriptionsFromCsv(file);
                 }
             }
         }

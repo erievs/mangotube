@@ -11,13 +11,21 @@ namespace ValleyTube
         public static string _selectedQuality;
         private static bool _screenTimeOut;
         private static bool _doubleTapToSkip;
+        private static bool _showSponserSkipMessage;
+        private static bool _useFormatStreamForDownloads;
 
         private static string _invidiousInstance = "https://inv.nadeko.net";
         private static string _invidiousInstanceComments = "https://inv.nadeko.net";
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
         private static string _SponserBlockInstance = "https://sponsor.ajay.app";
 
+        public static string version = "Beta 1.20";
+
         public const int MaxHistorySize = 500;
+
+        private static int _recommendVideoLimit = 25;
+
+        private static int _howManySubbedVideosToFetch = 5;
 
         public static bool isDash
         {
@@ -37,6 +45,26 @@ namespace ValleyTube
                 _isSponserBlock = value;
                 SaveSetting("isSponserBlock", value);
             }  
+        }
+
+        public static bool showSponserSkipMessage
+        {
+            get { return _showSponserSkipMessage; }
+            set
+            {
+                _showSponserSkipMessage = value;
+                SaveSetting("showSponserSkipMessage", value);
+            }
+        }
+
+        public static bool useFormatStreamForDownloads
+        {
+            get { return _useFormatStreamForDownloads; }
+            set
+            {
+                _useFormatStreamForDownloads = value;
+                SaveSetting("useFormatStreamForDownloads", value);
+            }
         }
 
         public static bool doubleTapToSkip
@@ -119,6 +147,27 @@ namespace ValleyTube
             }
         }
 
+        public static int RecommendVideoLimit
+        {
+            get { return _recommendVideoLimit; }
+            set
+            {
+                _recommendVideoLimit = value;
+                SaveSetting("RecommendVideoLimit", value);
+            }
+        }
+
+        public static int HowManySubbedVideosToFetch
+        {
+            get { return _howManySubbedVideosToFetch; }
+            set
+            {
+                _recommendVideoLimit = value;
+                SaveSetting("HowManySubbedVideosToFetch", value);
+            }
+        }
+
+
         public static void SaveSetting(string key, object value)
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -161,9 +210,19 @@ namespace ValleyTube
                 _isSponserBlock = (bool)localSettings.Values["isSponserBlock"];
             }
 
+            if (localSettings.Values.ContainsKey("useFormatStreamForDownloads"))
+            {
+                _useFormatStreamForDownloads = (bool)localSettings.Values["useFormatStreamForDownloads"];
+            }
+
+            if (localSettings.Values.ContainsKey("showSponserSkipMessage"))
+            {
+                _showSponserSkipMessage = (bool)localSettings.Values["showSponserSkipMessage"]; 
+            } 
+
             if (localSettings.Values.ContainsKey("doubleTapToSkip"))
             {
-                _doubleTapToSkip = (bool)localSettings.Values["doubleTapToSkip"];
+                _doubleTapToSkip = (bool)localSettings.Values["doubleTapToSkip"]; 
             }
             
             if (localSettings.Values.ContainsKey("InvidiousInstance"))
@@ -186,6 +245,17 @@ namespace ValleyTube
                 _returnDislikeInstance = (string)localSettings.Values["ReturnDislikeInstance"];
             }
 
+            if (localSettings.Values.ContainsKey("RecommendVideoLimit"))
+            {
+                _recommendVideoLimit = (int)localSettings.Values["RecommendVideoLimit"];
+            }
+
+            if (localSettings.Values.ContainsKey("HowManySubbedVideosToFetch"))
+            {
+                _howManySubbedVideosToFetch = (int)localSettings.Values["HowManySubbedVideosToFetch"];
+            }
+
         }
     }
 }
+

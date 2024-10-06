@@ -43,6 +43,37 @@ namespace ValleyTube
             }
         }
 
+        public static string ConvertViewsToShortFormat(long viewCount)
+        {
+            if (viewCount >= 1000000000)
+            {
+                return (viewCount / 1000000000D).ToString("0.#") + "B";
+            }
+            else if (viewCount >= 1000000)
+            {
+                return (viewCount / 1000000D).ToString("0.#") + "M";
+            }
+            else if (viewCount >= 1000)
+            {
+                return (viewCount / 1000D).ToString("0.#") + "k";
+            }
+            else
+            {
+                return viewCount.ToString();
+            }
+        }
+
+        public static string AddCommasToNumber(long number)
+        {
+            return number.ToString("N0");
+        }
+
+        public static string ConvertKeywordsToCommaSeparated(List<string> keywords)
+        {
+
+            return string.Join(",", keywords);
+        }
+
         internal static string ConvertUnixTimestampToRelativeTime(string published)
         {
             throw new NotImplementedException();

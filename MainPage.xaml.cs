@@ -15,6 +15,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Popups;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace ValleyTube
 {
@@ -45,7 +47,11 @@ namespace ValleyTube
             TimeoffToggleSwitch.IsOn = Settings.ScreenTimeOut;
             AutoplayToggleSwitch.IsOn = Settings.IsAutoplayEnabled;
             SponserblockSwitch.IsOn = Settings.isSponserBlock;
+            ShowSponserSkipSwitch.IsOn = Settings.showSponserSkipMessage;
             DoulbeTapToSkipkSwitchUggh.IsOn = Settings.doubleTapToSkip;
+            SubbedVideosTextBox.Text = Settings.HowManySubbedVideosToFetch.ToString();
+            RecommendedVideosTextBox.Text = Settings.RecommendVideoLimit.ToString();
+
 
             System.Diagnostics.Debug.WriteLine(Settings.ScreenTimeOut);
 
@@ -161,10 +167,6 @@ namespace ValleyTube
                     var response = await httpClient.GetStringAsync(apiUrl);
                     var videos = JsonConvert.DeserializeObject<List<TrendingVideo>>(response);
 
-                    foreach (var video in videos)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Video ID: " + video.VideoId);
-                    }
 
                     listView.ItemsSource = videos;
                 }
@@ -177,18 +179,22 @@ namespace ValleyTube
 
         public static async Task<List<VideoResult>> FetchLatestVideosAsync(string authorId)
         {
-            string apiUrl = Settings.InvidiousInstance + "/api/v1/channels/{authorId}";
+
+            string apiUrl = Settings.InvidiousInstance + $"/api/v1/channels/{authorId}";
 
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
+
+                    System.Diagnostics.Debug.WriteLine("Fetching channel data from URL: " + apiUrl);
+
                     var response = await client.GetStringAsync(apiUrl);
                     var channel = JsonConvert.DeserializeObject<Channel>(response);
 
                     var limitedVideos = new List<VideoResult>();
 
-                    for (int i = 0; i < channel.LatestVideos.Count && i < 5; i++)
+                    for (int i = 0; i < channel.LatestVideos.Count && i < Settings.HowManySubbedVideosToFetch; i++)
                     {
                         limitedVideos.Add(channel.LatestVideos[i]);
                     }
@@ -197,7 +203,9 @@ namespace ValleyTube
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error fetching channel data: " + ex.Message);
+
+                    System.Diagnostics.Debug.WriteLine("Error fetching channel data from URL: " + apiUrl);
+                    System.Diagnostics.Debug.WriteLine("Error message: " + ex.Message);
                     return new List<VideoResult>();
                 }
             }
@@ -206,6 +214,14 @@ namespace ValleyTube
         public static async Task<List<VideoResult>> GetSubscribedChannelsVideosAsync()
         {
             var videos = new List<VideoResult>();
+
+            if (SubscriptionManager.SubscribedAuthors == null || SubscriptionManager.SubscribedAuthors.Count == 0)
+            {
+
+                var dialog = new MessageDialog("Subscribe to a channel!");
+                await dialog.ShowAsync();
+                return videos;
+            }
 
             foreach (var author in SubscriptionManager.SubscribedAuthors)
             {
@@ -222,7 +238,8 @@ namespace ValleyTube
         {
             if (_videoHistory == null || _videoHistory.Count == 0)
             {
-                ShowShit("Watch a video to get recommended!");
+                var dialog = new MessageDialog("Watch a video to get recommended!");
+                await dialog.ShowAsync();
                 return;
             }
 
@@ -274,7 +291,7 @@ namespace ValleyTube
                                     recommendedVideosList.AddRange(tempRecommendedVideos);
                                 }
 
-                                if (recommendedVideosList.Count >= 10)
+                                if (recommendedVideosList.Count >= Settings.RecommendVideoLimit)
                                 {
                                     return;
                                 }
@@ -371,13 +388,13 @@ namespace ValleyTube
             }
         }
 
-        private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        private async void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
             var scrollViewer = sender as ScrollViewer;
 
             if (scrollViewer != null)
             {
-   
+
                 if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
                 {
                     string query = SearchBox.Text.Trim();
@@ -386,7 +403,7 @@ namespace ValleyTube
                         _currentPage++;
                         Debug.WriteLine($"Loading Page: {_currentPage}");
 
-                         Search(query, _currentPage);
+                        await Search(query, _currentPage);
                     }
                 }
             }
@@ -412,7 +429,7 @@ namespace ValleyTube
             return null;
         }
 
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var searchBox = sender as TextBox;
             var query = searchBox.Text;
@@ -422,7 +439,7 @@ namespace ValleyTube
                 _currentPage = 1;
                 _hasMoreResults = true;
                 _searchResults.Clear();
-                Search(query);
+                await Search(query);
             }
             else
             {
@@ -470,7 +487,7 @@ namespace ValleyTube
                 case "search":
                     if (!string.IsNullOrEmpty(SearchBox.Text.Trim()))
                     {
-                        Search(SearchBox.Text.Trim());
+                        await Search(SearchBox.Text.Trim());
                     }
                     else
                     {
@@ -541,12 +558,6 @@ namespace ValleyTube
 
                 string jsonHistory = JsonConvert.SerializeObject(_videoHistory);
 
-                if (jsonHistory.Length > 1024 * 1024)
-                {
-                    Debug.WriteLine("Video history size exceeds limit, not saving.");
-                    return;
-                }
-
                 var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
                 localSettings.Values["VideoHistory"] = jsonHistory;
             }
@@ -571,19 +582,19 @@ namespace ValleyTube
 
         // Buttons and Similar Ui Elements
 
-        private async void ClearSubcriptions_Click(object sender, RoutedEventArgs e)
+        private void ClearSubcriptions_Click(object sender, RoutedEventArgs e)
         {
             SubscriptionManager.ClearSubscriptions();
             SubscriptionManager.SaveSubscriptions();
 
         }
 
-        private async void ClearHistory_Click(object sender, RoutedEventArgs e)
+        private void ClearHistory_Click(object sender, RoutedEventArgs e)
         {
             ClearHistory();
         }
 
-        private async void ClearSavedSettings_Click(object sender, RoutedEventArgs e)
+        private void ClearSavedSettings_Click(object sender, RoutedEventArgs e)
         {
             Settings.ClearSettings();
         }
@@ -643,6 +654,15 @@ namespace ValleyTube
             }
         }
 
+        private void ShowSponserSkip_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                Settings.showSponserSkipMessage = toggleSwitch.IsOn;
+                InitializeDisplayRequest();
+            }
+        }
 
         private void DoulbeTapToSkip_Toggled(object sender, RoutedEventArgs e)
         {
@@ -650,6 +670,16 @@ namespace ValleyTube
             if (toggleSwitch != null)
             {
                 Settings.doubleTapToSkip = toggleSwitch.IsOn;
+                InitializeDisplayRequest();
+            }
+        }
+
+        private void UseFormatScreenToDownloadVideos_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                Settings.useFormatStreamForDownloads = toggleSwitch.IsOn;
                 InitializeDisplayRequest();
             }
         }
@@ -674,6 +704,45 @@ namespace ValleyTube
             Settings.SponserBlockInstance = SponserblockTextBox.Text;
         }
 
+        private void SetSubbedVideos_Click(object sender, RoutedEventArgs e)
+        {
+            int value;
+            if (int.TryParse(SubbedVideosTextBox.Text, out value) && value >= 1 && value <= 100)
+            {
+                Settings.HowManySubbedVideosToFetch = value;
+
+                ShowDialog("Subscribed videos limit updated successfully.");
+            }
+            else
+            {
+                ShowDialog("Please enter a valid number between 1 and 100 for subscribed videos.");
+                SubbedVideosTextBox.Text = string.Empty;
+            }
+        }
+
+        private void SetRecommendedVideos_Click(object sender, RoutedEventArgs e)
+        {
+            int value;
+            if (int.TryParse(RecommendedVideosTextBox.Text, out value) && value >= 1 && value <= 100)
+            {
+                Settings.RecommendVideoLimit = value;
+
+                ShowDialog("Recommended videos limit updated successfully.");
+            }
+            else
+            {
+                ShowDialog("Please enter a valid number between 1 and 100 for recommended videos.");
+                RecommendedVideosTextBox.Text = string.Empty;
+            }
+        }
+
+        private async void ShowDialog(string message)
+        {
+            var dialog = new Windows.UI.Popups.MessageDialog(message);
+            await dialog.ShowAsync();
+        }
+
+
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
@@ -697,6 +766,22 @@ namespace ValleyTube
       
                 }
             }
+        }
+
+        private async void AboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            string version = Settings.version;
+            string aboutMessage = $"MangoTube - Version {version}\n\n" +
+                                  "MangoTube is a YouTube client for Windows Phone 8.1 and 10 devices.\n\n" +
+                                  "Credits:\n\n" +
+                                  "NCP3.0 (Developer)\n\n" +
+                                  "Return Dislike API (Dislikes)\n\n" +
+                                  "Invidious (For their great APIs!)\n\n" +
+                                  "SponsorBlock (For Sponsorblock)!\n\n" +
+                                  "Windows Phone Community For Their Support!";
+
+            var dialog = new MessageDialog(aboutMessage, "About");
+            await dialog.ShowAsync();
         }
 
         private void ImportSubscriptionsButton_Click(object sender, RoutedEventArgs e)
@@ -754,6 +839,7 @@ namespace ValleyTube
     }
 
 
+
     public class SearchResult
     {
         public List<VideoResult> Results { get; set; }
@@ -776,6 +862,12 @@ namespace ValleyTube
         public Thumbnail Thumbnail { get; set; }
         public int LengthSeconds { get; set; }
         public string authorId { get; set; }
+        public string viewCount { get; set; }
+        
+        public string genre { get; set; }
+        public List<string> Keywords { get; set; } = new List<string>();
+
+
 
         public string LengthFormatted
         {
@@ -922,7 +1014,9 @@ namespace ValleyTube
         public string Title { get; set; }
         public string Author { get; set; }
         public string Description { get; set; }
+
         public string ViewCountText { get; set; }
+
         public string PublishedText { get; set; }
         public string Type { get; set; }
 

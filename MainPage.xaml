@@ -276,6 +276,7 @@
                                     <ComboBoxItem Content="144p" Tag="144"/>
                                     <ComboBoxItem Content="240p" Tag="240"/>
                                     <ComboBoxItem Content="360p Direct" Tag="360p-direct"/>
+                                    <ComboBoxItem Content="360p Format Stream" Tag="360p-format-stream"/>
                                     <ComboBoxItem Content="360p" Tag="360"/>
                                     <ComboBoxItem Content="480p" Tag="480"/>
                                     <ComboBoxItem Content="720p" Tag="720"/>
@@ -317,6 +318,8 @@
                                     TextWrapping="Wrap" 
                                     Margin="0,5,0,0"/>
                         </StackPanel>
+                        
+
 
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
@@ -326,6 +329,21 @@
                                     Margin="20,0,0,0"/>
                             </StackPanel>
                             <TextBlock Text="This enables sponsorblock integration."
+                                    FontSize="16" 
+                                    Foreground="LightGray" 
+                                    TextWrapping="Wrap" 
+                                    Margin="0,5,0,0"/>
+                        </StackPanel>
+
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <TextBlock Text="Show Sponser Skip Message" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="ShowSponserSkipSwitch" 
+                                    Toggled="ShowSponserSkip_Toggled" 
+                                    Margin="20,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="This enables sponser skip messages, so whenever a sponser segement is skipped it shows a message."
                                     FontSize="16" 
                                     Foreground="LightGray" 
                                     TextWrapping="Wrap" 
@@ -346,6 +364,41 @@
                                     TextWrapping="Wrap" 
                                     Margin="0,5,0,0"/>
                         </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <TextBlock Text="Alt Video Download " FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                                <ToggleSwitch x:Name="UseFormatScreenToDownloadVideos" 
+                                    Toggled="UseFormatScreenToDownloadVideos_Toggled" 
+                                    Margin="20,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="This changes how we download your videos, by deafult we will use a direct link however some instances block it so if you choose this option we will get the video url using adaptiveFormats in the JSON. Sadly this like with direct only offers 360p."
+                                    FontSize="16" 
+                                    Foreground="LightGray" 
+                                    TextWrapping="Wrap" 
+                                    Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="How Many Videos To Get Per Subed Channel" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBox x:Name="SubbedVideosTextBox" 
+              Width="100" 
+              Margin="0,10,0,0" />
+                            <Button Content="Set" Click="SetSubbedVideos_Click" Width="100" Margin="0,0,0,0" />
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="How Many Recommended Videos" FontSize="20" Foreground="White" VerticalAlignment="Center" Margin="0,20,0,0"/>
+                            <TextBox x:Name="RecommendedVideosTextBox" 
+              Width="100" 
+              Margin="0,10,0,0" />
+                            <Button Content="Set" Click="SetRecommendedVideos_Click" Width="100" Margin="0,0,0,0" />
+
+                        </StackPanel>
+
+
+
 
                         <!-- Import Subscriptions -->
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
@@ -444,6 +497,17 @@
                            Margin="0,5,0,0"/>
                         </StackPanel>
 
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <Button Content="About" Click="AboutButton_Click" Width="100" Margin="0,20,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="Erie Valley Software, Copyright 2022-2024"
+                           FontSize="20" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                        </StackPanel>
 
 
                     </StackPanel>

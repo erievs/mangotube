@@ -16,41 +16,41 @@
 
         <TextBlock x:Name="StatusTextBlock" Foreground="Red" />
 
-        <StackPanel Margin="10" Grid.Row="0">
-            <TextBlock x:Name="VideoTitle" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,10,0,10"/>
+            <StackPanel Margin="10" Grid.Row="0">
+                <TextBlock x:Name="VideoTitle" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,10,0,10"/>
 
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
-                <MediaElement x:Name="VideoPlayer"
-                      AutoPlay="True"
-                      Stretch="UniformToFill"
-                      AreTransportControlsEnabled="True"
-                      Width="455"
-                      Height="300"
-                      CurrentStateChanged="VideoPlayer_CurrentStateChanged"
-                      MediaEnded="MediaElement_MediaEnded"
-                      MediaOpened="VideoPlayer_MediaOpened"
-                      DoubleTapped="VideoPlayer_DoubleTapped"/>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <MediaElement x:Name="VideoPlayer"
+                          AutoPlay="True"
+                          Stretch="UniformToFill"
+                          AreTransportControlsEnabled="True"
+                          Width="455"
+                          Height="300"
+                          CurrentStateChanged="VideoPlayer_CurrentStateChanged"
+                          MediaEnded="MediaElement_MediaEnded"
+                          MediaOpened="VideoPlayer_MediaOpened"
+                          DoubleTapped="VideoPlayer_DoubleTapped"/>
 
-                <Canvas x:Name="OverlayCanvas">
-                    <TextBlock x:Name="SponsorSkipMessageTextBlock"
-                       FontSize="20"
-                       Foreground="White"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Visibility="Collapsed"
-                       Opacity="0.9"
-                       Padding="5"/>
-                </Canvas>
+                    <Canvas x:Name="OverlayCanvas">
+                        <TextBlock x:Name="SponsorSkipMessageTextBlock"
+                           FontSize="20"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"
+                           Opacity="0.9"
+                           Padding="5"/>
+                    </Canvas>
 
-                <MediaElement x:Name="AudioPlayer"
-                      AutoPlay="True"
-                      Width="0"
-                      Height="0"
-                      Volume="1.0"
-                      MediaEnded="MediaElement_MediaEnded"
-                      MediaOpened="AudioPlayer_MediaOpened"/>
+                    <MediaElement x:Name="AudioPlayer"
+                          AutoPlay="True"
+                          Width="0"
+                          Height="0"
+                          Volume="1.0"
+                          MediaEnded="MediaElement_MediaEnded"
+                          MediaOpened="AudioPlayer_MediaOpened"/>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
 
         <Pivot Margin="10" Grid.Row="1">
@@ -80,10 +80,12 @@
                                    Text="" 
                                    Margin="0,0,5,0"/>
 
-                                    <TextBlock x:Name="DateTextBlock"
+                                   <TextBlock x:Name="DateTextBlock"
                                    FontSize="16"
                                    Foreground="White"
                                    Text=""/>
+
+
 
                                 </StackPanel>
                             </Button>
@@ -99,15 +101,41 @@
                             <TextBlock x:Name="DislikesTextBlock"
                                    FontSize="16"
                                    Foreground="White"/>
+
+                            <TextBlock x:Name="ViewTextBlock"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   Text=""/>
+
+
                         </StackPanel>
 
-                        <TextBlock x:Name="DescriptionTextBlock"
+                        <RichTextBlock x:Name="DescriptionRichTextBlock" 
+                           TextWrapping="Wrap" 
+                           FontSize="16" 
+                           Foreground="White" 
+                           Margin="10">
+                            <Paragraph>
+                               
+                            </Paragraph>
+                        </RichTextBlock>
+
+
+                        <TextBlock x:Name="GenreTextBlock"
                                TextWrapping="Wrap"
                                FontSize="16"
                                Foreground="White"
                                Margin="10"/>
 
 
+                        <TextBlock x:Name="TagsTextBlock"
+                               TextWrapping="Wrap"
+                               FontSize="16"
+                               Foreground="White"
+                               Margin="10"/>
+
+
+                        
                         <TextBlock x:Name="DownloadProgressLabel" 
                            Text="Download Progress" 
                            Visibility="Collapsed" 
@@ -130,7 +158,7 @@
             </PivotItem>
 
             <PivotItem Header="comments">
-                <ScrollViewer x:Name="CommentsScrollViewer">
+                <ScrollViewer x:Name="CommentsScrollViewer" ViewChanged="CommentsScrollViewer_ViewChanged">
                     <StackPanel>
                         <ListView x:Name="CommentsListView" Margin="10">
                             <ListView.ItemTemplate>
@@ -142,7 +170,6 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Button x:Name="LoadMoreCommentsButton" Content="Load More Comments" HorizontalAlignment="Center" Margin="10" Click="LoadMoreComments_Click"/>
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
@@ -152,7 +179,7 @@
                     <ListView x:Name="RelatedVideosListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="10">
+                                <StackPanel Orientation="Horizontal" Margin="0">
                                     <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click">
                                         <Grid>
                                             <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
@@ -180,13 +207,16 @@
             
         </Pivot>
     </Grid>
-
+    
     <Page.BottomAppBar>
         <CommandBar IsSticky="True">
-                <AppBarButton Icon="Back" Label="Back" Click="BackButton_Click"/>
-            <AppBarButton Icon="Download" Label="Download" Click="DownloadButton_Click"/>   
+            <AppBarButton Icon="Back" Label="Back" Click="BackButton_Click"/>
+            <AppBarButton Icon="Download" Label="Download" Click="DownloadButton_Click"/>
+            <AppBarButton Icon="ReShare" Label="Share" Click="ShareButton_Click"/>
+            <AppBarButton Icon="Pin" Label="Pin" Click="PinButton_Click" Visibility="Collapsed"/>
         </CommandBar>
     </Page.BottomAppBar>
+
 
 
 </Page>
