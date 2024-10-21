@@ -19,7 +19,7 @@ namespace ValleyTube
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
         private static string _SponserBlockInstance = "https://sponsor.ajay.app";
 
-        public static string version = "Beta 1.10";
+        public static string version = "Beta 1.2.0";
 
         public const int MaxHistorySize = 500;
 

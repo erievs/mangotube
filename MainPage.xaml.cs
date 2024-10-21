@@ -22,13 +22,9 @@ namespace ValleyTube
 {
     public sealed partial class MainPage : Page
     {
-        private ObservableCollection<VideoResult> _searchResults = new ObservableCollection<VideoResult>();
-        private int _currentPage = 1;
-        private const int _resultsPerPage = 20;
+
         private static List<VideoResult> _videoHistory = new List<VideoResult>();
         public Windows.System.Display.DisplayRequest displayRequest = null;
-        private bool _isSearching = false;
-        private bool _hasMoreResults = true; 
 
         public MainPage()
         {
@@ -324,92 +320,6 @@ namespace ValleyTube
             return v2.Published.CompareTo(v1.Published);
         }
 
-        private async Task Search(string query, int page = 1)
-        {
-            if (_isSearching || !_hasMoreResults) return;
-
-            _isSearching = true;
-            string apiUrl = string.Format(Settings.InvidiousInstance + "/api/v1/search?q={0}&page={1}&sort=relevance",
-                                            Uri.EscapeDataString(query), page);
-
-            using (var httpClient = new HttpClient())
-            {
-                try
-                {
-                    var response = await httpClient.GetStringAsync(apiUrl);
-                    var searchResults = JsonConvert.DeserializeObject<List<VideoResult>>(response);
-
-                    if (searchResults == null || searchResults.Count == 0)
-                    {
-                        _hasMoreResults = false;
-                        return;
-                    }
-
-                    foreach (var video in searchResults)
-                    {
-                        if (!string.IsNullOrEmpty(video.VideoId))
-                        {
-                            _searchResults.Add(video);
-                        }
-
-                        // Check for channel type
-                        if (video.Type == "channel")
-                        {
-                            System.Diagnostics.Debug.WriteLine("Channel found: " + video.AuthorId);
-                            _searchResults.Add(video);
-                        }
-                    }
-
-                    if (page == 1)
-                    {
-                        SearchListView.ItemsSource = _searchResults;
-                    }
-
-                    _currentPage = page;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Error fetching search results: " + ex.Message);
-                }
-                finally
-                {
-                    _isSearching = false;
-                }
-            }
-        }
-
-        private void SearchListView_Loaded(object sender, RoutedEventArgs e)
-        {
-            var scrollViewer = GetScrollViewer(SearchListView);
-            if (scrollViewer != null)
-            {
-
-                scrollViewer.ViewChanged += ScrollViewer_ViewChanged;
-            }
-        }
-
-        private async void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
-        {
-            var scrollViewer = sender as ScrollViewer;
-
-            if (scrollViewer != null)
-            {
-
-                if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
-                {
-                    string query = SearchBox.Text.Trim();
-                    if (!string.IsNullOrEmpty(query) && _hasMoreResults)
-                    {
-                        _currentPage++;
-                        Debug.WriteLine($"Loading Page: {_currentPage}");
-
-                        await Search(query, _currentPage);
-                    }
-                }
-            }
-        }
-
-
         private ScrollViewer GetScrollViewer(DependencyObject depObj)
         {
             if (depObj is ScrollViewer)
@@ -427,26 +337,6 @@ namespace ValleyTube
                 }
             }
             return null;
-        }
-
-        private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            var searchBox = sender as TextBox;
-            var query = searchBox.Text;
-
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                _currentPage = 1;
-                _hasMoreResults = true;
-                _searchResults.Clear();
-                await Search(query);
-            }
-            else
-            {
-                _searchResults.Clear();
-                SearchListView.ItemsSource = null;
-                _hasMoreResults = true;
-            }
         }
 
 
@@ -483,16 +373,6 @@ namespace ValleyTube
                     break;
                 case "movies":
                     LoadMoviesVideos();
-                    break;
-                case "search":
-                    if (!string.IsNullOrEmpty(SearchBox.Text.Trim()))
-                    {
-                        await Search(SearchBox.Text.Trim());
-                    }
-                    else
-                    {
-                        SearchListView.ItemsSource = null;
-                    }
                     break;
                 case "history":
                     LoadHistory();
@@ -742,32 +622,6 @@ namespace ValleyTube
             await dialog.ShowAsync();
         }
 
-
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = sender as Button;
-            if (button != null)
-            {
-                VideoResult video = button.DataContext as VideoResult;
-
-                if (video != null)
-                {
-                    if (!string.IsNullOrEmpty(video.AuthorId) && video.Type == "channel")
-                    {
-                        System.Diagnostics.Debug.WriteLine("Navigating to channel with Author ID: " + video.AuthorId);
-                        Frame.Navigate(typeof(ChannelPage), video.AuthorId);
-                    }
-                    else
-                    {         
-                        System.Diagnostics.Debug.WriteLine("Navigating to video with ID: " + video.VideoId);
-                        SaveHistory(video);
-                        Frame.Navigate(typeof(VideoPage), video.VideoId);
-                    }
-      
-                }
-            }
-        }
-
         private async void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             string version = Settings.version;
@@ -830,6 +684,11 @@ namespace ValleyTube
 
                 System.Diagnostics.Debug.WriteLine("ComboBox is null.");
             }
+        }
+
+        private void SearchButtonToPage_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(SearchPage));
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

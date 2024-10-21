@@ -1012,6 +1012,11 @@ namespace ValleyTube
             DataTransferManager.ShowShareUI();
         }
 
+        private void SearchButtonToPage_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(SearchPage));
+        }
+
         private async void PinButton_Click(object sender, RoutedEventArgs e)
         {
 

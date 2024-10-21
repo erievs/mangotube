@@ -212,6 +212,7 @@
         <CommandBar IsSticky="True">
             <AppBarButton Icon="Back" Label="Back" Click="BackButton_Click"/>
             <AppBarButton Icon="Download" Label="Download" Click="DownloadButton_Click"/>
+            <AppBarButton Icon="Find" Label="Search" Click="SearchButtonToPage_Click"/>
             <AppBarButton Icon="ReShare" Label="Share" Click="ShareButton_Click"/>
             <AppBarButton Icon="Pin" Label="Pin" Click="PinButton_Click" Visibility="Collapsed"/>
         </CommandBar>

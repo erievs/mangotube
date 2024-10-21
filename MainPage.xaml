@@ -184,58 +184,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
-
-            <PivotItem Header="search">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBox x:Name="SearchBox" PlaceholderText="Search..." Margin="10" TextChanged="SearchBox_TextChanged" Grid.Row="0"/>
-
-                    <ListView x:Name="SearchListView" Loaded="SearchListView_Loaded" Margin="10" Grid.Row="1" ItemClick="TrendsListView_ItemClick">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0">
-                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="SearchButton_Click">
-                                        <Grid>
-                                            
-                                            <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill" 
-                                             Visibility="{Binding VideoThumbnails[0].Url, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-
-                                            <Image Source="{Binding FirstAuthorThumbnailUrl, Converter={StaticResource StringToImageSourceConverter}}"  Width="90" Height="90" 
-                                               Margin="0,0,10,0" Stretch="UniformToFill"  Visibility="{StaticResource NullOrEmptyToVisibilityConverter}"/>
-
-
-                                            <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
-                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold" 
-                                                    Visibility="{Binding Type, Converter={StaticResource ChannelTypeToVisibilityConverter}}" />
-                                            </Border>
-                                            
-                                        </Grid>
-                                    </Button>
-                                    <StackPanel>
-
-                                        <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White" Visibility="{Binding Title, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                                        <TextBlock Text="{Binding ChannelHandle}" FontSize="20" FontWeight="Bold" Foreground="White" Visibility="{Binding ChannelHandle, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                                        <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
-                                        <TextBlock Text="{Binding FormattedSubCount}" FontSize="14" Foreground="Gray" Visibility="{Binding Type, Converter={StaticResource ChannelTypeToVisibilityConverterOppsite}}"/>
-                                        <TextBlock Text="{Binding Description}" FontSize="14" Foreground="Gray" Visibility="{Binding Description, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                                        <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray" Visibility="{Binding ViewCountText, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                                        <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray" Visibility="{Binding PublishedText, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-
-                                    </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-
-
-                </Grid>
-            </PivotItem>
-
+            
             <PivotItem Header="subscriptions">
                 <ListView x:Name="SubscriptionsListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -524,6 +473,15 @@
                HorizontalAlignment="Center" 
                Margin="0,125,0,0" 
                Visibility="Collapsed"/>
+       
         
     </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar IsSticky="True">
+            <AppBarButton Icon="Find" Label="Search" Click="SearchButtonToPage_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+
+
 </Page>
