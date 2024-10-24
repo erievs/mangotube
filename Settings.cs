@@ -35,7 +35,7 @@ namespace ValleyTube
 
         // dumbass devs MAKE SURE to remove your own before release 
 
-        public static string version = "Beta 1.3.0";
+        public static string version = "Beta 1.3.5";
 
         public const int MaxHistorySize = 500;
 

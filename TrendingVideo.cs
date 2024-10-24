@@ -49,13 +49,11 @@ namespace ValleyTube
         {
             get
             {
-                if (VideoThumbnails != null && VideoThumbnails.Count > 0)
-                {
-                    return VideoThumbnails[0].Url;
-                }
-                return string.Empty;
+                return $"https://img.youtube.com/vi/{VideoId}/default.jpg";
             }
         }
+
+
 
         public string ViewCountText
         {

@@ -11,6 +11,7 @@
     
     <Grid>
         <Pivot Name="BobIsYourUncle" Title="" SelectionChanged="Pivot_SelectionChanged">
+            
             <PivotItem Header="trending">
                 <ListView x:Name="TrendingListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -35,6 +36,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
+            
             <PivotItem Header="recommended">
                 <ListView x:Name="RecommendedListView" ItemClick="TrendsListView_ItemClick">
                     <TextBlock x:Name="RecTextNoHistroy" Text="dfdfdfd" FontSize="20" FontWeight="Bold" Foreground="White" 
@@ -45,7 +47,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
-                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                         <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
                                             <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                         </Border>
@@ -62,6 +64,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
+            
             <PivotItem Header="popular">
                 <ListView x:Name="PopularListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -86,6 +89,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
+            
             <PivotItem Header="gaming">
                 <ListView x:Name="GamingListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -110,6 +114,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
+            
             <PivotItem Header="music">
                 <ListView x:Name="MusicListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -134,6 +139,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
+            
             <PivotItem Header="movies">
                 <ListView x:Name="MoviesListView" ItemClick="TrendsListView_ItemClick">
                     <ListView.ItemTemplate>
@@ -167,7 +173,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
-                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                         <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
                                             <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                         </Border>
@@ -192,7 +198,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0">
                                 <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
                                     <Grid>
-                                        <Image Source="{Binding VideoThumbnails[0].Url}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
                                         <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
                                             <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
                                         </Border>

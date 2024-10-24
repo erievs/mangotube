@@ -23,6 +23,7 @@ using System.Text;
 using Windows.Security.Authentication.Web;
 using System.Net.Http.Headers;
 using Windows.ApplicationModel.Activation;
+using Windows.Phone.UI.Input;
 
 namespace ValleyTube
 {
@@ -1235,10 +1236,9 @@ namespace ValleyTube
             string tileId = "VideoTile_" + videoId;
 
             string thumbnailUrl = string.Empty;
-            if (video.VideoThumbnails != null && video.VideoThumbnails.Count > 0)
-            {
-                thumbnailUrl = video.VideoThumbnails[0].Url;
-            }
+
+            thumbnailUrl = video.ThumbnailUrl;
+            
 
 
             if (string.IsNullOrEmpty(thumbnailUrl))
@@ -1306,6 +1306,26 @@ namespace ValleyTube
                     System.Diagnostics.Debug.WriteLine("Error fetching video details: " + ex.Message);
                     return null;
                 }
+            }
+        }
+
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+                return;
+
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true;
+            }
+            else
+            {
+
+                e.Handled = false;
             }
         }
 

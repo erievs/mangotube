@@ -64,24 +64,6 @@ namespace ValleyTube
 
         }
 
-        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
-        {
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            if (rootFrame == null)
-                return;
-
-            if (rootFrame.CanGoBack)
-            {
-                rootFrame.GoBack();
-                e.Handled = true;
-            }
-            else
-            { 
-
-                e.Handled = false;
-            }
-        }
 
         private void SetComboBoxSelection(ComboBox comboBox, string selectedQuality)
         {
@@ -435,15 +417,7 @@ namespace ValleyTube
                 VideoId = video.VideoId,
                 Title = video.Title,
                 Author = video.Author,
-                
-
-                VideoThumbnails = new List<VideoThumbnail>
-        {
-            new VideoThumbnail
-            {
-                Url = video.ThumbnailUrl
-            }
-        }
+    
             };
 
             AddVideoToHistory(videoResult);
@@ -753,6 +727,27 @@ namespace ValleyTube
         {
 
         }
+
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+                return;
+
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true;
+            }
+            else
+            {
+
+                e.Handled = false;
+            }
+        }
+
     }
 
 
@@ -890,6 +885,7 @@ namespace ValleyTube
         }
     }
 
+
     public class VideoFormat
     {
         public string url { get; set; }
@@ -938,7 +934,15 @@ namespace ValleyTube
         public string Type { get; set; }
 
         public Thumbnail Thumbnail { get; set; }
-        public List<VideoThumbnail> VideoThumbnails { get; set; } = new List<VideoThumbnail>();
+
+
+        public string ThumbnailUrl
+        {
+            get
+            {
+                return $"https://img.youtube.com/vi/{VideoId}/default.jpg";
+            }
+        }
 
         public List<AuthorThumbnail> AuthorThumbnails { get; set; } = new List<AuthorThumbnail>();
 

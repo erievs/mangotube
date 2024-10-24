@@ -377,16 +377,9 @@ namespace ValleyTube
                 VideoId = video.videoId,
                 Title = video.Title,
                 Author = video.Author,
-
-
-                VideoThumbnails = new List<VideoThumbnail>
-        {
-            new VideoThumbnail
-            {
-                Url = video.ThumbnailUrl
-            }
-        }
             };
+
+
 
             MainPage.AddVideoToHistory(videoResult);
         }
