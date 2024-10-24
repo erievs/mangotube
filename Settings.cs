@@ -21,7 +21,7 @@ namespace ValleyTube
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
         private static string _SponserBlockInstance = "https://sponsor.ajay.app";
 
-        private static string accessToken;
+        private static string accessToken = "";
 
         private static string _clientId = "";
 
