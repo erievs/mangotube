@@ -214,7 +214,7 @@
             
         </Pivot>
     </Grid>
-    
+
     <Page.BottomAppBar>
         <CommandBar IsSticky="True">
             <AppBarButton Icon="Download" Label="Download" Click="DownloadButton_Click"/>
