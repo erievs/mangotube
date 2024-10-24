@@ -347,9 +347,6 @@
                         </StackPanel>
 
 
-
-
-                        <!-- Import Subscriptions -->
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
                             <Button x:Name="ImportSubscriptionsButton" 
                         Content="Import Subscriptions" 
@@ -405,6 +402,127 @@
                             <Button Content="Set Sponserblock Instance" 
                             Click="SetSponserblockTextBoxButton_Click" 
                             Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="Access Token" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="AccessToken" 
+                            Text="{Binding Path=AccessToken}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+
+                            <Button Content="Set Access Token" 
+                            Click="SetAccessToken_Click" 
+                            Margin="0,5,0,0"/>
+
+                            <TextBlock Text="You shouldn't really need to set this; it should auto-fill when you sign in for the first time."
+                            FontSize="16" 
+                            Foreground="LightGray" 
+                            TextWrapping="Wrap" 
+                             Margin="0,5,0,0"/>
+                         </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            
+                            <TextBlock Text="ClientId" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="ClientId" 
+                            Text="{Binding Path=ClientId}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+
+                            <Button Content="Set ClientId" 
+                            Click="SetClientId_Click" 
+                            Margin="0,5,0,0"/>
+
+                            <TextBlock Text="Set your ClientId from the client_secret json file you got when setting up the OAuth API stuff in the google cloud panel!"
+                            FontSize="16" 
+                            Foreground="LightGray" 
+                            TextWrapping="Wrap" 
+                             Margin="0,5,0,0"/>
+                            
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+
+                            <TextBlock Text="ClientSecret" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="ClientSecret" 
+                            Text="{Binding Path=ClientSecret}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+
+                            <Button Content="Set ClientSecret" 
+                            Click="SetClientSecret_Click" 
+                            Margin="0,5,0,0"/>
+
+                            <TextBlock Text="Set your ClientSecret from the client_secret json file you got when setting up the OAuth API stuff in the google cloud panel!"
+                            FontSize="16" 
+                            Foreground="LightGray" 
+                            TextWrapping="Wrap" 
+                             Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+
+                            <TextBlock Text="Scope" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="Scope" 
+                            Text="{Binding Path=Scope}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+
+                            <Button Content="Set Scope" 
+                            Click="SetScope_Click" 
+                            Margin="0,5,0,0"/>
+
+                            <TextBlock Text="You can probbaly leave this be, since we need to use the YouTube Scope!"
+                            FontSize="16" 
+                            Foreground="LightGray" 
+                            TextWrapping="Wrap" 
+                             Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+
+                            <TextBlock Text="RedirectUri" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="RedirectUri" 
+                            Text="{Binding Path=Scope}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+
+                            <Button Content="Set RedirectUri" 
+                            Click="SetRedirectUri_Click" 
+                            Margin="0,5,0,0"/>
+
+                            <TextBlock Text="You can probbaly leave this be, use whatever you have set in your cleint_secret but the default is localhost iirc.!"
+                            FontSize="16" 
+                            Foreground="LightGray" 
+                            TextWrapping="Wrap" 
+                             Margin="0,5,0,0"/>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">
+                            <TextBlock Text="YouTube API Key" FontSize="20" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBox x:Name="YouTubeAPIKey" 
+                            Text="{Binding Path=YouTubeAPIKey}" 
+                            Margin="0,5,0,0" 
+                            Width="300"/>
+                            <Button Content="Set YouTube API Key" 
+                            Click="SetYouTubeAPIKey_Click" 
+                            Margin="0,5,0,0"/>
+
+                           <TextBlock Text="The YouTube api key used for commenting (and at some point other features), DO NOT share this with anyone! Google YouTube API v3 or something"
+                           FontSize="16" 
+                           Foreground="LightGray" 
+                           TextWrapping="Wrap" 
+                           Margin="0,5,0,0"/>
+                            
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,20,0,0">

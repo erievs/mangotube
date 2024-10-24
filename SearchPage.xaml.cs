@@ -9,6 +9,7 @@ using Windows.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media;
 using System.Collections.Generic;
+using Windows.Phone.UI.Input;
 
 namespace ValleyTube
 {
@@ -23,6 +24,25 @@ namespace ValleyTube
         public SearchPage()
         {
             this.InitializeComponent();
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+                return;
+
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true;
+            }
+            else
+            {
+
+                e.Handled = false;
+            }
         }
 
         private async Task Search(string query, int page = 1)
@@ -173,7 +193,6 @@ namespace ValleyTube
                 }
                 catch (TaskCanceledException)
                 {
-                    // Handle task cancellation
                     Debug.WriteLine("Search task was canceled.");
                 }
             }
@@ -185,14 +204,9 @@ namespace ValleyTube
             }
         }
 
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.GoBack();
-        }
-
         private void SaveHistory(VideoResult video)
         {
-            // Implementation for saving video history
+
         }
 
         private void SearchListView_SelectionChanged(object sender, SelectionChangedEventArgs e)

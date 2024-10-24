@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.Phone.UI.Input;
 
 namespace ValleyTube
 {
@@ -40,6 +41,12 @@ namespace ValleyTube
             InvidiousInstanceCommentsTextBox.Text = Settings.InvidiousInstanceComments;
             ReturnDislikesTextBox.Text = Settings.ReturnDislikeInstance;
             SponserblockTextBox.Text = Settings.SponserBlockInstance;
+            YouTubeAPIKey.Text = Settings.YouTubeAPIKey;
+            AccessToken.Text = Settings.AccessToken; 
+            ClientId.Text = Settings.ClientId;
+            ClientSecret.Text = Settings.ClientSecret;
+            Scope.Text = Settings.Scope;
+            RedirectUri.Text = Settings.RedirectUri;
             TimeoffToggleSwitch.IsOn = Settings.ScreenTimeOut;
             AutoplayToggleSwitch.IsOn = Settings.IsAutoplayEnabled;
             SponserblockSwitch.IsOn = Settings.isSponserBlock;
@@ -55,6 +62,25 @@ namespace ValleyTube
 
             SetComboBoxSelection(QualityComboBox, Settings.SelectedQuality);
 
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+                return;
+
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true;
+            }
+            else
+            { 
+
+                e.Handled = false;
+            }
         }
 
         private void SetComboBoxSelection(ComboBox comboBox, string selectedQuality)
@@ -583,6 +609,38 @@ namespace ValleyTube
         {
             Settings.SponserBlockInstance = SponserblockTextBox.Text;
         }
+
+        private void SetYouTubeAPIKey_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.YouTubeAPIKey = YouTubeAPIKey.Text;
+        }
+
+        private void SetAccessToken_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.AccessToken = AccessToken.Text;
+        }
+
+        private void SetClientId_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.ClientId = ClientId.Text;
+        }
+
+        private void SetClientSecret_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.ClientSecret = ClientSecret.Text;
+        }
+
+        private void SetScope_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Scope = Scope.Text;
+        }
+
+        private void SetRedirectUri_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.RedirectUri = RedirectUri.Text;
+        }
+
+
 
         private void SetSubbedVideos_Click(object sender, RoutedEventArgs e)
         {

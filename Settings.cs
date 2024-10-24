@@ -8,7 +8,9 @@ namespace ValleyTube
         private static bool _isDash;
         private static bool _isSponserBlock;
         private static bool _isAutoplayEnabled;
+
         public static string _selectedQuality;
+
         private static bool _screenTimeOut;
         private static bool _doubleTapToSkip;
         private static bool _showSponserSkipMessage;
@@ -19,7 +21,21 @@ namespace ValleyTube
         private static string _returnDislikeInstance = "https://returnyoutubedislikeapi.com";
         private static string _SponserBlockInstance = "https://sponsor.ajay.app";
 
-        public static string version = "Beta 1.2.0";
+        private static string accessToken;
+
+        private static string _clientId = "";
+
+        private static string _clientSecret = ""; // shhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+
+        private static string _youTubeAPIKey = "";
+
+        private static string _scope = "https://www.googleapis.com/auth/youtube.force-ssl";
+
+        private static string _redirectUri = "http://localhost";
+
+        // dumbass devs MAKE SURE to remove your own before release 
+
+        public static string version = "Beta 1.3.0";
 
         public const int MaxHistorySize = 500;
 
@@ -45,6 +61,56 @@ namespace ValleyTube
                 _isSponserBlock = value;
                 SaveSetting("isSponserBlock", value);
             }  
+        }
+
+        public static string AccessToken
+        {
+            get { return accessToken; }
+            set
+            {
+                accessToken = value;
+                SaveSetting("AccessToken", value);
+            }
+        }
+
+        public static string ClientId
+        {
+            get { return _clientId; }
+            set
+            {
+                _clientId = value;
+                SaveSetting("ClientId", value);
+            }
+        }
+
+        public static string Scope
+        {
+            get { return _scope; }
+            set
+            {
+                _scope = value;
+                SaveSetting("Scope", value);
+            }
+        }
+
+        public static string ClientSecret
+        {
+            get { return _clientSecret; }
+            set
+            {
+                _clientSecret = value;
+                SaveSetting("ClientSecret", value);
+            }
+        }
+
+        public static string RedirectUri
+        {
+            get { return _redirectUri; }
+            set
+            {
+                _redirectUri = value;
+                SaveSetting("RedirectUri", value);
+            }
         }
 
         public static bool showSponserSkipMessage
@@ -104,6 +170,16 @@ namespace ValleyTube
             {
                 _selectedQuality = value;
                 SaveSetting("SelectedQuality", value);
+            }
+        }
+
+        public static string YouTubeAPIKey
+        {
+            get { return _youTubeAPIKey; }
+            set
+            {
+                _youTubeAPIKey = value;
+                SaveSetting("YouTubeAPIKey", value);
             }
         }
 
@@ -253,6 +329,36 @@ namespace ValleyTube
             if (localSettings.Values.ContainsKey("HowManySubbedVideosToFetch"))
             {
                 _howManySubbedVideosToFetch = (int)localSettings.Values["HowManySubbedVideosToFetch"];
+            }
+
+            if (localSettings.Values.ContainsKey("YouTubeAPIKey"))
+            {
+                _youTubeAPIKey = (string)localSettings.Values["YouTubeAPIKey"];
+            }
+
+            if (localSettings.Values.ContainsKey("AccessToken"))
+            {
+                accessToken = (string)localSettings.Values["AccessToken"];
+            }
+
+            if (localSettings.Values.ContainsKey("ClientId"))
+            {
+                _clientId = (string)localSettings.Values["ClientId"];
+            }
+
+            if (localSettings.Values.ContainsKey("ClientSecret"))
+            {
+                _clientSecret = (string)localSettings.Values["ClientSecret"];
+            }
+
+            if (localSettings.Values.ContainsKey("RedirectUri"))
+            {
+                _redirectUri = (string)localSettings.Values["RedirectUri"];
+            }
+
+            if (localSettings.Values.ContainsKey("Scope"))
+            {
+                _scope = (string)localSettings.Values["Scope"];
             }
 
         }

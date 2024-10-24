@@ -7,6 +7,8 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Phone.UI.Input;
+using Windows.Security.Authentication.Web;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -97,6 +99,8 @@ namespace ValleyTube
                 }
             }
 
+            HardwareButtons.BackPressed += OnBackPressed;
+
             // Ensure the current window is active
             Window.Current.Activate();
         }
@@ -113,8 +117,27 @@ namespace ValleyTube
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
         }
 
+        private void OnBackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
 
-        protected override async void OnActivated(IActivatedEventArgs args)
+            if (rootFrame == null)
+                return;
+
+            // If there is a page to go back to
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true; // Mark event as handled
+            }
+            else
+            {
+                // If there's no page to go back to, you can choose to exit the app
+                e.Handled = false; // Allow the system to close the app
+            }
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
         {
             base.OnActivated(args);
 
@@ -123,12 +146,41 @@ namespace ValleyTube
             {
                 var file = fileArgs.Files[0];
                 var rootFrame = Window.Current.Content as Frame;
-                var mainPage = rootFrame.Content as MainPage;
+                var mainPage = rootFrame?.Content as MainPage;
 
                 if (mainPage != null)
                 {
-                    await SubscriptionManager.ImportSubscriptionsFromCsv(file);
+                    SubscriptionManager.ImportSubscriptionsFromCsv(file);
                 }
+            }
+
+            var authArgs = args as WebAuthenticationBrokerContinuationEventArgs;
+            if (authArgs != null)
+            {
+                var authenticationResult = authArgs.WebAuthenticationResult;
+                var rootFrame = Window.Current.Content as Frame;
+
+                if (rootFrame == null)
+                {
+                    rootFrame = new Frame();
+                    Window.Current.Content = rootFrame;
+                }
+
+                // Check if the current content is VideoPage
+                VideoPage videoPage = rootFrame.Content as VideoPage;
+
+                if (videoPage != null)
+                {
+                    videoPage.HandleAuthenticationResult(authenticationResult);
+                }
+
+                else
+                  {
+                    rootFrame.Navigate(typeof(VideoPage), authenticationResult);
+                }
+
+                // Ensure the window is activated
+                Window.Current.Activate();
             }
         }
 

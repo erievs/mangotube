@@ -19,6 +19,10 @@ using Windows.UI.Xaml.Documents;
 using System.Text.RegularExpressions;
 using Windows.UI.Xaml.Input;
 using Windows.UI;
+using System.Text;
+using Windows.Security.Authentication.Web;
+using System.Net.Http.Headers;
+using Windows.ApplicationModel.Activation;
 
 namespace ValleyTube
 {
@@ -37,6 +41,7 @@ namespace ValleyTube
             this.InitializeComponent();
             InitializeSyncTimer();
             SubscriptionManager.LoadSubscriptions();
+            ToggleCommentInputPanel();
 
         }
 
@@ -66,22 +71,49 @@ namespace ValleyTube
         {
             base.OnNavigatedTo(e);
 
-            string parameter = e.Parameter as string;
-            if (parameter != null)
+            if (e.Parameter != null)
             {
-                videoId = parameter;
-                System.Diagnostics.Debug.WriteLine("Navigated to VideoPage with videoId: " + videoId);
+                string parameter = e.Parameter as string;
+                if (!string.IsNullOrWhiteSpace(parameter))
+                {
+                    videoId = parameter;
+                    System.Diagnostics.Debug.WriteLine("Navigated to VideoPage with videoId: " + videoId);
 
-                LoadLikesDislikesData(videoId);
-                LoadComments();
-
-                await LoadVideoDetails();
-                await LoadRelatedVideos();
-
+                    await LoadVideoDetails(); 
+                    await LoadRelatedVideos();
+                    LoadLikesDislikesData(videoId); 
+                    LoadComments(); 
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Error: Parameter is not a valid string or is empty.");
+                }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Error: Parameter is not a valid string.");
+                System.Diagnostics.Debug.WriteLine("Error: e.Parameter is null.");
+            }
+        }
+
+
+        public async Task HandleAuthenticationResult(WebAuthenticationResult result)
+        {
+            if (result.ResponseStatus == WebAuthenticationStatus.Success)
+            {
+                string responseData = result.ResponseData;
+
+                string authorizationCode = ExtractAuthorizationCode(responseData);
+
+                Settings.AccessToken = await GetAccessToken(authorizationCode);
+
+                if (!string.IsNullOrEmpty(Settings.AccessToken))
+                {
+                    System.Diagnostics.Debug.WriteLine("User authenticated successfully.");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Authentication failed: " + result.ResponseStatus);
             }
         }
 
@@ -620,6 +652,176 @@ namespace ValleyTube
             }
         }
 
+        private void ToggleCommentInputPanel()
+        {
+            string youtubeApiKey = Settings.YouTubeAPIKey;
+            if (string.IsNullOrEmpty(youtubeApiKey))
+            {
+
+                CommentInputPanel.Visibility = Visibility.Collapsed;
+                System.Diagnostics.Debug.WriteLine("YouTube API key is missing. Comment input panel hidden.");
+            }
+            else
+            {
+
+                CommentInputPanel.Visibility = Visibility.Visible;
+                System.Diagnostics.Debug.WriteLine("YouTube API key is available. Comment input panel visible.");
+            }
+        }
+
+        private string GetAuthorizationUrl()
+        {
+            return $"https://accounts.google.com/o/oauth2/auth?client_id={Settings.ClientId}&redirect_uri={Settings.RedirectUri}&scope={Settings.Scope}&response_type=code";
+        }
+
+        private async void AuthenticateUser()
+        {
+            string authUrl = GetAuthorizationUrl();
+            var startUri = new Uri(authUrl);
+            var endUri = new Uri(Settings.RedirectUri);
+            WebAuthenticationBroker.AuthenticateAndContinue(startUri, endUri);
+        }
+
+        private string ExtractAuthorizationCode(string responseData)
+        {
+            var uri = new Uri(responseData);
+            string query = uri.Query;
+
+            var queryParams = new Dictionary<string, string>();
+            foreach (var pair in query.TrimStart('?').Split('&'))
+            {
+                var parts = pair.Split('=');
+                if (parts.Length == 2)
+                {
+                    queryParams[parts[0]] = Uri.UnescapeDataString(parts[1]);
+                }
+            }
+
+            return queryParams.ContainsKey("code") ? queryParams["code"] : null;
+        }
+
+        private async Task<string> GetAccessToken(string authorizationCode)
+        {
+            string tokenUrl = "https://oauth2.googleapis.com/token"; // we dont need no google api lib!
+            var postData = new JObject
+            {
+                ["code"] = authorizationCode,
+                ["client_id"] = Settings.ClientId,
+                ["client_secret"] = Settings.ClientSecret,
+                ["redirect_uri"] = Settings.RedirectUri,
+                ["grant_type"] = "authorization_code"
+            };
+
+            using (var httpClient = new HttpClient())
+            {
+                var content = new StringContent(postData.ToString(), Encoding.UTF8, "application/json");
+
+                try
+                {
+                    var response = await httpClient.PostAsync(tokenUrl, content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonResponse = await response.Content.ReadAsStringAsync();
+                        var tokenResponse = JObject.Parse(jsonResponse);
+                        Settings.AccessToken = tokenResponse["access_token"].ToString(); 
+                        System.Diagnostics.Debug.WriteLine($"Access Token: {Settings.AccessToken}"); 
+                        return Settings.AccessToken;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Failed to retrieve access token.");
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error retrieving access token: " + ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        private async Task SubmitComment()
+        {
+
+            string commentText = CommentTextBox.Text;
+            System.Diagnostics.Debug.WriteLine($"Comment Text: '{commentText}'");
+
+            if (string.IsNullOrWhiteSpace(commentText))
+            {
+                System.Diagnostics.Debug.WriteLine("Comment is empty.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is missing.");
+                return;
+            }
+
+            string postCommentUrl = $"https://www.googleapis.com/youtube/v3/commentThreads?key={Settings.YouTubeAPIKey}&part=snippet";
+
+            var postData = new JObject
+            {
+                ["snippet"] = new JObject
+                {
+                    ["videoId"] = videoId,
+                    ["topLevelComment"] = new JObject
+                    {
+                        ["snippet"] = new JObject
+                        {
+                            ["textOriginal"] = commentText
+                        }
+                    }
+                }
+            };
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.AccessToken);
+                
+                var content = new StringContent(postData.ToString(), Encoding.UTF8, "application/json");
+                System.Diagnostics.Debug.WriteLine($"Request Payload: {postData}");
+
+                try
+                {
+                    var response = await httpClient.PostAsync(postCommentUrl, content);
+                    System.Diagnostics.Debug.WriteLine($"Response Status Code: {response.StatusCode}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Comment submitted successfully.");
+                        CommentTextBox.Text = "";
+                        LoadComments();
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("Failed to submit comment.");
+                        System.Diagnostics.Debug.WriteLine($"Status Code: {response.StatusCode}");
+                        System.Diagnostics.Debug.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error submitting comment: " + ex.Message);
+                }
+            }
+        }
+
+        private async void SubmitCommentButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(string.IsNullOrEmpty(Settings.AccessToken)) {
+                AuthenticateUser();
+            }
+  
+            if (!string.IsNullOrEmpty(Settings.AccessToken))
+            {
+                await SubmitComment();
+            }
+        }
+
         private void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
         {
 
@@ -903,11 +1105,6 @@ namespace ValleyTube
             }
         }
 
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(MainPage));
-        }
-
         private async Task<string> GetCurrentAuthorAsync(string videoId)
         {
             string apiUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
@@ -1042,6 +1239,7 @@ namespace ValleyTube
             {
                 thumbnailUrl = video.VideoThumbnails[0].Url;
             }
+
 
             if (string.IsNullOrEmpty(thumbnailUrl))
             {

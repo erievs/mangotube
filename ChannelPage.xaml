@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="MainGrid">
-  
+
         <Grid x:Name="BackgroundGrid">
             <Image x:Name="BackgroundImage" Stretch="UniformToFill"/>
             <Rectangle Fill="Black" Opacity="0.7" IsHitTestVisible="False"/>
@@ -83,9 +83,4 @@
         </Grid>
     </Grid>
 
-    <Page.BottomAppBar>
-        <CommandBar IsSticky="True">
-            <AppBarButton Icon="Back" Label="Back" Click="BackButton_Click"/>
-        </CommandBar>
-    </Page.BottomAppBar>
 </Page>

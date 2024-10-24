@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Collections.ObjectModel;
-
+using Windows.Phone.UI.Input;
 
 namespace ValleyTube
 {
@@ -26,6 +26,25 @@ namespace ValleyTube
             this.InitializeComponent();
             SubscriptionManager.LoadSubscriptions();
 
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+                return;
+
+            if (rootFrame.CanGoBack)
+            {
+                rootFrame.GoBack();
+                e.Handled = true; 
+            }
+            else
+            {
+             
+                e.Handled = false; 
+            }
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -384,11 +403,6 @@ namespace ValleyTube
                     LoadMoreCommunityPosts();
                 }
             }
-        }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.GoBack();
         }
 
         private void ImageButton_Click(object sender, RoutedEventArgs e)
