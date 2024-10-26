@@ -10,7 +10,7 @@
     <DeviceId>30F105C9-681E-420B-A277-7C086EAD8A4E</DeviceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DeviceId>A754CC38-6EE5-40E2-8BDF-5CB561BECF94</DeviceId>
+    <DeviceId>33D7CE1E-0D98-4E5C-89B9-4AD2183E2DB6</DeviceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DeviceId>BC33F59A-75C2-482D-A3EB-5B80CD5F0DDE</DeviceId>

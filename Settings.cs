@@ -29,13 +29,17 @@ namespace ValleyTube
 
         private static string _youTubeAPIKey = "";
 
+        public static string InnerTubeAPIKey = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
+
         private static string _scope = "https://www.googleapis.com/auth/youtube.force-ssl";
+
+        public static string InnerTubeBase = "https://www.youtube.com/youtubei/v1/player?key={InnerTubeAPIKey}";
 
         private static string _redirectUri = "http://localhost";
 
         // dumbass devs MAKE SURE to remove your own before release 
 
-        public static string version = "Beta 1.3.5";
+        public static string version = "Beta 1.4.0";
 
         public const int MaxHistorySize = 500;
 

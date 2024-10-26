@@ -5,18 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 public static class SubscriptionManager
 {
-    private const string SubscribedAuthorsKey = "SubscribedAuthors";
+    private const string SubscriptionsFileName = "subscriptions.txt";
     public static List<string> SubscribedAuthors { get; private set; }
 
     static SubscriptionManager()
     {
         SubscribedAuthors = new List<string>();
-        LoadSubscriptions();
+        LoadSubscriptions(); 
     }
 
     public static void Subscribe(string channelId)
@@ -80,8 +78,11 @@ public static class SubscriptionManager
     {
         try
         {
+            var folder = ApplicationData.Current.LocalFolder;
+            var file = folder.CreateFileAsync(SubscriptionsFileName, CreationCollisionOption.ReplaceExisting).AsTask().Result;
+
             var serializedIds = string.Join(",", SubscribedAuthors);
-            ApplicationData.Current.LocalSettings.Values[SubscribedAuthorsKey] = serializedIds;
+            FileIO.WriteTextAsync(file, serializedIds).AsTask().Wait();
         }
         catch (Exception ex)
         {
@@ -93,28 +94,25 @@ public static class SubscriptionManager
     {
         try
         {
-            var localSettings = ApplicationData.Current.LocalSettings;
+            var folder = ApplicationData.Current.LocalFolder;
+            var file = folder.GetFileAsync(SubscriptionsFileName).AsTask().Result;
 
-            if (localSettings.Values.ContainsKey(SubscribedAuthorsKey))
+            var serializedIds = FileIO.ReadTextAsync(file).AsTask().Result;
+            if (!string.IsNullOrEmpty(serializedIds))
             {
-                var serializedIds = localSettings.Values[SubscribedAuthorsKey] as string;
-
-                if (!string.IsNullOrEmpty(serializedIds))
-                {
-                    SubscribedAuthors = serializedIds.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                    System.Diagnostics.Debug.WriteLine("Subscriptions successfully loaded.");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("No subscriptions found in local settings.");
-                    SubscribedAuthors = new List<string>();
-                }
+                SubscribedAuthors = serializedIds.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                System.Diagnostics.Debug.WriteLine("Subscriptions successfully loaded.");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("No subscriptions key found in local settings.");
+                System.Diagnostics.Debug.WriteLine("No subscriptions found in the file.");
                 SubscribedAuthors = new List<string>();
             }
+        }
+        catch (FileNotFoundException)
+        {
+            System.Diagnostics.Debug.WriteLine("No subscriptions file found.");
+            SubscribedAuthors = new List<string>(); 
         }
         catch (Exception ex)
         {

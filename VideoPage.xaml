@@ -20,12 +20,13 @@
                 <TextBlock x:Name="VideoTitle" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,10,0,10"/>
 
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                    
                     <MediaElement x:Name="VideoPlayer"
                           AutoPlay="True"
                           Stretch="UniformToFill"
                           AreTransportControlsEnabled="True"
-                          Width="455"
-                          Height="300"
+                          Width="0"
+                          Height="0"
                           CurrentStateChanged="VideoPlayer_CurrentStateChanged"
                           MediaEnded="MediaElement_MediaEnded"
                           MediaOpened="VideoPlayer_MediaOpened"
@@ -53,7 +54,7 @@
             </StackPanel>
 
 
-        <Pivot Margin="10" Grid.Row="1">
+        <Pivot Margin="5" Grid.Row="1">
             <PivotItem Header="details">
                 <ScrollViewer>
                     <StackPanel>
@@ -71,28 +72,55 @@
                             Foreground="White"
                             VerticalAlignment="Center"/>
 
+
                             <Button Background="Transparent" BorderBrush="Transparent" Click="AuthorButton_Click" Padding="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+
                                     <TextBlock x:Name="AuthorTextBlock"
-                                       
-                                   FontSize="16"
-                                   Foreground="White"
-                                   Text="" 
-                                   Margin="0,0,5,0"/>
+                                       FontSize="16"
+                                       Foreground="White"
+                                       Text=""
+                                       Margin="0,0,5,0"
+                                       TextWrapping="Wrap"
+                                       TextTrimming="CharacterEllipsis"/>
 
-                                   <TextBlock x:Name="DateTextBlock"
-                                   FontSize="16"
-                                   Foreground="White"
-                                   Text=""/>
-
-
+                                                            <TextBlock x:Name="DateTextBlock"
+                                       FontSize="16"
+                                       Foreground="White"
+                                       Text=""
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"/>
 
                                 </StackPanel>
+
                             </Button>
                             
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,0">
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8.5">
+                            <Button x:Name="LikeButton"
+                                Content="Like"
+                                Click="LikeButton_Click"
+                                Background="Black"  
+                                Foreground="White"     
+                                Padding="10,5"         
+                                />
+
+                            <Button x:Name="WatchLaterButton"
+                                Content="Watch Later"
+                                Click="WatchLaterButton_Click"
+                                Background="Black"  
+                                Foreground="White"     
+                                Margin="10,0,0,0"      
+                                Padding="10,5"         
+                                />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0">
+                            
+                
+
                             <TextBlock x:Name="LikesTextBlock"
                                    FontSize="16"
                                    Foreground="White"
@@ -110,6 +138,8 @@
 
                         </StackPanel>
 
+
+
                         <RichTextBlock x:Name="DescriptionRichTextBlock" 
                            TextWrapping="Wrap" 
                            FontSize="16" 
@@ -120,6 +150,7 @@
                             </Paragraph>
                         </RichTextBlock>
 
+                        
 
                         <TextBlock x:Name="GenreTextBlock"
                                TextWrapping="Wrap"

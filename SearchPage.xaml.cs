@@ -20,6 +20,8 @@ namespace ValleyTube
         private int _currentPage = 1;
         private ObservableCollection<VideoResult> _searchResults = new ObservableCollection<VideoResult>();
         private CancellationTokenSource _cancellationTokenSource;
+        private const int ChannelsToLoad = 10; 
+private int _currentChannelIndex = 0; 
 
         public SearchPage()
         {

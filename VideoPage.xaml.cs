@@ -36,6 +36,8 @@ namespace ValleyTube
         private bool isSyncing = false;
         private VideoResult nextVideo;
         private List<SponsorBlockSegment> sponsorSegments;
+        private LikedVideosManager likedVideosManager = new LikedVideosManager();
+        private WatchLaterManager watchLaterManager = new WatchLaterManager();
 
         public VideoPage()
         {
@@ -43,7 +45,21 @@ namespace ValleyTube
             InitializeSyncTimer();
             SubscriptionManager.LoadSubscriptions();
             ToggleCommentInputPanel();
+            UpdateLikeButtonState();
+            UpdateWatchLaterButtonState();
+            VideoWidthRes();
 
+        }
+
+        private void VideoWidthRes()
+        {
+            double screenHeight = Window.Current.Bounds.Height;
+            double desiredHeight = screenHeight * 0.35;
+            double screenWidth = Window.Current.Bounds.Width;
+            double desiredWidth = screenWidth * 0.9; 
+
+            VideoPlayer.Height = desiredHeight; 
+            VideoPlayer.Width = desiredWidth;   
         }
 
         private void InitializeSyncTimer()
@@ -208,70 +224,8 @@ namespace ValleyTube
                     VideoTitle.Text = video.Title;
                     aurthorId = video.authorId;
 
-                    Uri videoUri = null;
-                    Uri audioUri = null;
-
-                    var selectedQuality = Settings.SelectedQuality;
-                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality);
-
-                    sponsorSegments = await GetSponsorSegments(videoId);
-
-                    if (selectedQuality == "360p-direct")
-                    {
-                        string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", video.VideoId);
-                        videoUri = new Uri(videoUrlString);
-                        System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri);
-                    }
-
-                    else if (selectedQuality == "360p-format-stream")
-                    {
-
-                        var adaptiveFormat = video.formatStreams.FirstOrDefault(f => f.qualityLabel == "360p");
-
-                        if (adaptiveFormat != null)
-                        {
-                            videoUri = new Uri(adaptiveFormat.url);
-                            System.Diagnostics.Debug.WriteLine("Using Adaptive Video URL: " + videoUri.AbsoluteUri);
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("No 360p-adaptive format found.");
-                        }
-                    }
-                    else
-                    {
-                        videoUri = GetBestVideoUri(video.adaptiveFormats, selectedQuality, out audioUri);
-                        System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found"));
-
-                        if (audioUri != null)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri);
-                        }
-                    }
-
-                    VideoPlayer.MediaFailed += (sender, args) =>
-                    {
-                        System.Diagnostics.Debug.WriteLine("Media failed to play. Error: " + args.ErrorMessage);
-                    };
-
-                    if (videoUri != null)
-                    {
-                        VideoPlayer.Source = videoUri;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No valid video URL found.");
-                    }
-
-                    if (audioUri != null && Settings.SelectedQuality != "360p-direct")
-                    {
-                        AudioPlayer.Source = audioUri;
-                        AudioPlayer.Play();
-                    }
-
                     long unixTimestamp = long.Parse(video.published);
                     long views = long.Parse(video.viewCount);
-
                     string formattedDate = Utils.ConvertUnixTimestampToRelativeTime(unixTimestamp);
                     string formattedViews = Utils.AddCommasToNumber(views);
                     string formattedTags = Utils.ConvertKeywordsToCommaSeparated(video.Keywords);
@@ -285,6 +239,179 @@ namespace ValleyTube
                     TagsTextBlock.Text = "Tags: " + formattedTags;
 
                     InitializeSubscriptionButton(video.VideoId);
+
+                    Uri videoUri = null;
+                    Uri audioUri = null;
+
+                    var selectedQuality = Settings.SelectedQuality;
+                    System.Diagnostics.Debug.WriteLine("Selected Quality: " + selectedQuality);
+
+                    sponsorSegments = await GetSponsorSegments(videoId);
+                    if (selectedQuality.EndsWith("-innertube"))
+                    {
+                        string innerTubeVideoUrl = Settings.InnerTubeBase + "/youtubei/v1/player?key=" + Settings.InnerTubeAPIKey;
+
+                        DateTime currentUtcDateTime = DateTime.UtcNow;
+                        long signature_timestamp = (long)(currentUtcDateTime - new DateTime(1970, 1, 1)).TotalSeconds;
+
+                        var contextData = new
+                        {
+                            videoId = videoId,
+                            context = new
+                            {
+                                client = new
+                                {
+                                    hl = "en",
+                                    gl = "US",
+                                    clientName = "IOS",
+                                    clientVersion = "19.29.1",
+                                    deviceMake = "Apple",
+                                    deviceModel = "iPhone",
+                                    osName = "iOS",
+                                    userAgent = "com.google.ios.youtube/19.29.1 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X;)",
+                                    osVersion = "17.5.1.21F90"
+                                }
+                            },
+                            playbackContext = new
+                            {
+                                contentPlaybackContext = new
+                                {
+                                    signatureTimestamp = signature_timestamp
+                                }
+                            }
+                        };
+
+                        string jsonContent = JsonConvert.SerializeObject(contextData);
+                        var requestContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                        try
+                        {
+                            var innerTubeResponse = await httpClient.PostAsync(innerTubeVideoUrl, requestContent);
+                            innerTubeResponse.EnsureSuccessStatusCode();
+
+                            var innerTubeData = await innerTubeResponse.Content.ReadAsStringAsync();
+                            System.Diagnostics.Debug.WriteLine("InnerTube API Response: " + innerTubeData);
+
+                            var innerTubeVideo = JsonConvert.DeserializeObject<InnerTubeVideoDetail>(innerTubeData);
+
+                            if (innerTubeVideo.streamingData != null && innerTubeVideo.streamingData.adaptiveFormats != null)
+                            {
+                                var innerTubeFormat = innerTubeVideo.streamingData.adaptiveFormats.FirstOrDefault(f => f.itag == 140);
+
+                                var videoFormats = innerTubeVideo.streamingData.adaptiveFormats.Select(f => new ValleyTube.Format
+                                {
+                                    itag = f.itag,
+                                    url = f.url,
+                                    height = f.height,
+                                    width = f.width,
+                                    mimeType = f.mimeType
+                                }).ToList();
+
+                                string cleanedQuality = selectedQuality.Replace("-innertube", "");
+
+                                Uri audioUrl;
+                                Uri bestVideoUrl = GetBestInnerTubeVideoUri(videoFormats, cleanedQuality, out audioUrl);
+
+                                System.Diagnostics.Debug.WriteLine("Best Video URI: " + (bestVideoUrl != null ? bestVideoUrl.AbsoluteUri : "Not Found"));
+
+                                if (bestVideoUrl != null)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Using InnerTube Video URL: " + bestVideoUrl.AbsoluteUri);
+                                    VideoPlayer.Source = bestVideoUrl;
+
+                                    if (innerTubeFormat != null)
+                                    {
+                                        var innerTubeAudioUri = new Uri(innerTubeFormat.url);
+                                        AudioPlayer.Source = innerTubeAudioUri;
+                                        System.Diagnostics.Debug.WriteLine("Using InnerTube Audio URL: " + innerTubeAudioUri.AbsoluteUri);
+                                    }
+                
+                                    VideoPlayer.MediaOpened += (sender, args) =>
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("Video started playing.");
+                                        if (audioUrl != null)
+                                        {
+                                            AudioPlayer.Source = audioUrl;
+                                            AudioPlayer.Play();
+                                        }
+                                    };
+
+                                    VideoPlayer.MediaFailed += (sender, args) =>
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("Media failed to play. Error: " + args.ErrorMessage);
+                                    };
+
+                                    VideoPlayer.Play();
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("No suitable video format found.");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error loading video details: " + ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        if (selectedQuality == "360p-direct")
+                        {
+                            string videoUrlString = string.Format(Settings.InvidiousInstance + "/latest_version?id={0}&itag=18&local=true", video.VideoId);
+                            videoUri = new Uri(videoUrlString);
+                            System.Diagnostics.Debug.WriteLine("Using Direct Video URL: " + videoUri.AbsoluteUri);
+                        }
+                        else if (selectedQuality == "360p-format-stream")
+                        {
+                            var adaptiveFormat = video.formatStreams.FirstOrDefault(f => f.qualityLabel == "360p");
+                            if (adaptiveFormat != null)
+                            {
+                                videoUri = new Uri(adaptiveFormat.url);
+                                System.Diagnostics.Debug.WriteLine("Using Adaptive Video URL: " + videoUri.AbsoluteUri);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("No 360p-adaptive format found.");
+                            }
+                        }
+                        else
+                        {
+                            videoUri = GetBestVideoUri(video.adaptiveFormats, selectedQuality, out audioUri);
+                            System.Diagnostics.Debug.WriteLine("Best Video URI: " + (videoUri != null ? videoUri.AbsoluteUri : "Not Found"));
+
+                            if (audioUri != null)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Audio URI: " + audioUri.AbsoluteUri);
+                            }
+                        }
+                    }
+                    
+                    VideoPlayer.MediaFailed += (sender, args) =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("Media failed to play. Error: " + args.ErrorMessage);
+                    };
+
+                    if (videoUri != null)
+                    {
+                        VideoPlayer.Source = videoUri;
+
+                        VideoPlayer.MediaOpened += (sender, args) =>
+                        {
+                            System.Diagnostics.Debug.WriteLine("Video started playing.");
+                            if (audioUri != null)
+                            {
+                                AudioPlayer.Source = audioUri;
+                                AudioPlayer.Play();
+                            }
+                        };
+
+                        VideoPlayer.Play();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("No valid video URL found.");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -367,6 +494,7 @@ namespace ValleyTube
             }
 
             var qualityRanges = new Dictionary<string, QualityRange>();
+
             qualityRanges.Add("144", new QualityRange(100, 199));
             qualityRanges.Add("240", new QualityRange(200, 299));
             qualityRanges.Add("360", new QualityRange(300, 399));
@@ -422,6 +550,87 @@ namespace ValleyTube
             System.Diagnostics.Debug.WriteLine("No suitable video format found.");
             return null;
         }
+
+        private Uri GetBestInnerTubeVideoUri(IEnumerable<Format> videoFormats, string selectedQuality, out Uri audioUri)
+        {
+            audioUri = null;
+
+            if (videoFormats == null || !videoFormats.Any())
+            {
+                System.Diagnostics.Debug.WriteLine("No video formats available.");
+                return null;
+            }
+
+            int targetHeight;
+            if (!int.TryParse(new string(selectedQuality.Where(char.IsDigit).ToArray()), out targetHeight))
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid quality format. Falling back to default height of 144.");
+                targetHeight = 144;
+            }
+
+            Format bestFormat = null;
+            int minHeightDifference = int.MaxValue;
+
+            System.Diagnostics.Debug.WriteLine("Available video formats:");
+            foreach (var format in videoFormats)
+            {
+                System.Diagnostics.Debug.WriteLine($"itag={format.itag}, mimeType={format.mimeType}, height={format.height}, url={format.url}");
+            }
+
+
+            foreach (Format format in videoFormats)
+            {
+                System.Diagnostics.Debug.WriteLine($"Checking format: itag={format.itag}, mimeType={format.mimeType}, height={format.height}, url={format.url}");
+
+
+                if (format.mimeType.Contains("mp4") && format.mimeType.Contains("video"))
+                {
+                    int height;
+                    if (int.TryParse(format.height, out height))
+                    {
+                        int heightDifference = Math.Abs(height - targetHeight);
+
+                        if (heightDifference < minHeightDifference)
+                        {
+                            minHeightDifference = heightDifference;
+                            bestFormat = format;
+                            System.Diagnostics.Debug.WriteLine($"Found better format: itag={format.itag}, height={height}");
+                        }
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Skipping format, height invalid: itag={format.itag}, height={format.height}");
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Skipping format, not a valid video/mp4: itag={format.itag}, mimeType={format.mimeType}");
+                }
+            }
+
+            if (bestFormat != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Selected video quality: " + bestFormat.qualityLabel);
+                System.Diagnostics.Debug.WriteLine("Selected video itag: " + bestFormat.itag);
+                Uri videoUri = new Uri(bestFormat.url);
+                
+                foreach (Format format in videoFormats)
+                {
+                    if (format != null && format.itag == 140) 
+                    {
+                        audioUri = new Uri(format.url);
+                        System.Diagnostics.Debug.WriteLine("Selected audio track URL: " + audioUri.AbsoluteUri);
+                        break;
+                    }
+                }
+
+                return videoUri;
+            }
+
+            System.Diagnostics.Debug.WriteLine("No suitable video format found.");
+            return null;
+        }
+
 
         private bool IsQualityInRange(string qualityLabel, int minQuality, int maxQuality)
         {
@@ -701,6 +910,274 @@ namespace ValleyTube
             return queryParams.ContainsKey("code") ? queryParams["code"] : null;
         }
 
+
+        private async void LikeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (string.IsNullOrEmpty(Settings.AccessToken))
+            {
+
+                 AuthenticateUser();
+
+                if (string.IsNullOrEmpty(Settings.AccessToken))
+                {
+                    System.Diagnostics.Debug.WriteLine("User is not authenticated after attempting to log in.");
+                    return;
+                }
+            }
+
+            if (likedVideosManager.IsVideoLiked(videoId))
+            {
+                await UnlikeVideo(videoId);
+                likedVideosManager.RemoveLikedVideo(videoId);
+                LikeButton.Content = "Like";
+            }
+            else
+            {
+                await LikeVideo(videoId);
+                likedVideosManager.AddLikedVideo(videoId);
+                LikeButton.Content = "Unlike";
+            }
+
+            UpdateLikeButtonState();
+        }
+
+        private void UpdateLikeButtonState()
+        {
+            if (likedVideosManager.IsVideoLiked(videoId))
+            {
+                LikeButton.Content = "Unlike";
+            }
+            else
+            {
+                LikeButton.Content = "Like";
+            }
+        }
+
+        private async void WatchLaterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(Settings.AccessToken))
+            {
+
+                AuthenticateUser();
+                return;
+            }
+
+            if (watchLaterManager.IsVideoInWatchLater(videoId))
+            {
+
+                await RemoveFromWatchLater(videoId);
+                watchLaterManager.RemoveWatchLaterVideo(videoId);
+                WatchLaterButton.Content = "Add to Watch Later";
+                System.Diagnostics.Debug.WriteLine($"Removed Video ID: '{videoId}' from Watch Later.");
+            }
+            else
+            {
+
+                await AddToWatchLater(videoId);
+                watchLaterManager.AddWatchLaterVideo(videoId);
+                WatchLaterButton.Content = "Remove from Watch Later";
+                System.Diagnostics.Debug.WriteLine($"Added Video ID: '{videoId}' to Watch Later.");
+            }
+
+            UpdateWatchLaterButtonState();
+        }
+
+        private async Task AddToWatchLater(string videoId)
+        {
+            System.Diagnostics.Debug.WriteLine($"Adding Video ID: '{videoId}' to Watch Later");
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is missing.");
+                return;
+            }
+
+            string addToWatchLaterUrl = "https://youtube.googleapis.com/youtube/v3/playlistItems?key=" + Settings.YouTubeAPIKey;
+
+            var requestBody = new
+            {
+                snippet = new
+                {
+                    playlistId = "WL",
+                    resourceId = new
+                    {
+                        kind = "youtube#video",
+                        videoId = videoId
+                    }
+                }
+            };
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.AccessToken);
+
+                try
+                {
+                    var json = JsonConvert.SerializeObject(requestBody);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    var response = await httpClient.PostAsync(addToWatchLaterUrl, content);
+                    System.Diagnostics.Debug.WriteLine($"Response Status Code: {response.StatusCode}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Video added to Watch Later successfully.");
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("Failed to add video to Watch Later.");
+                        System.Diagnostics.Debug.WriteLine($"Status Code: {response.StatusCode}");
+                        System.Diagnostics.Debug.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error adding video to Watch Later: " + ex.Message);
+                }
+            }
+        }
+
+        private async Task RemoveFromWatchLater(string videoId)
+        {
+            System.Diagnostics.Debug.WriteLine($"Removing Video ID: '{videoId}' from Watch Later");
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is missing.");
+                return;
+            }
+
+            string removeFromWatchLaterUrl = $"https://youtube.googleapis.com/youtube/v3/playlistItems?id={videoId}&key={Settings.YouTubeAPIKey}";
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.AccessToken);
+
+                try
+                {
+                    var response = await httpClient.DeleteAsync(removeFromWatchLaterUrl);
+                    System.Diagnostics.Debug.WriteLine($"Response Status Code: {response.StatusCode}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Video removed from Watch Later successfully.");
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("Failed to remove video from Watch Later.");
+                        System.Diagnostics.Debug.WriteLine($"Status Code: {response.StatusCode}");
+                        System.Diagnostics.Debug.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error removing video from Watch Later: " + ex.Message);
+                }
+            }
+        }
+
+        private async Task LikeVideo(string videoId)
+        {
+            System.Diagnostics.Debug.WriteLine($"Liking Video ID: '{videoId}'");
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is missing.");
+                return;
+            }
+
+            string likeVideoUrl = $"https://www.googleapis.com/youtube/v3/videos/rate?id={videoId}&rating=like&key={Settings.YouTubeAPIKey}";
+
+            using (var httpClient = new HttpClient())
+            {
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.AccessToken);
+
+                try
+                {
+
+                    var response = await httpClient.PostAsync(likeVideoUrl, null);
+                    System.Diagnostics.Debug.WriteLine($"Response Status Code: {response.StatusCode}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Video liked successfully.");
+
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("Failed to like video.");
+                        System.Diagnostics.Debug.WriteLine($"Status Code: {response.StatusCode}");
+                        System.Diagnostics.Debug.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error liking video: " + ex.Message);
+                }
+            }
+        }
+
+        private async Task UnlikeVideo(string videoId)
+        {
+            System.Diagnostics.Debug.WriteLine($"Unliking Video ID: '{videoId}'");
+
+            if (string.IsNullOrEmpty(videoId))
+            {
+                System.Diagnostics.Debug.WriteLine("Video ID is missing.");
+                return;
+            }
+
+            string unlikeVideoUrl = $"https://www.googleapis.com/youtube/v3/videos/rate?id={videoId}&rating=None&key={Settings.YouTubeAPIKey}";
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.AccessToken);
+
+                try
+                {
+                    var response = await httpClient.PostAsync(unlikeVideoUrl, null);
+                    System.Diagnostics.Debug.WriteLine($"Response Status Code: {response.StatusCode}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Video unliked successfully.");
+                    }
+                    else
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("Failed to unlike video.");
+                        System.Diagnostics.Debug.WriteLine($"Status Code: {response.StatusCode}");
+                        System.Diagnostics.Debug.WriteLine($"Reason Phrase: {response.ReasonPhrase}");
+                        System.Diagnostics.Debug.WriteLine($"Response Body: {responseBody}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error unliking video: " + ex.Message);
+                }
+            }
+        }
+
+        private void UpdateWatchLaterButtonState()
+        {
+            if (watchLaterManager.IsVideoInWatchLater(videoId))
+            {
+                WatchLaterButton.Content = "Remove from Watch Later";
+            }
+            else
+            {
+                WatchLaterButton.Content = "Add to Watch Later";
+            }
+        }
+
         private async Task<string> GetAccessToken(string authorizationCode)
         {
             string tokenUrl = "https://oauth2.googleapis.com/token"; // we dont need no google api lib!
@@ -811,6 +1288,7 @@ namespace ValleyTube
             }
         }
 
+
         private async void SubmitCommentButton_Click(object sender, RoutedEventArgs e)
         {
             if(string.IsNullOrEmpty(Settings.AccessToken)) {
@@ -822,6 +1300,7 @@ namespace ValleyTube
                 await SubmitComment();
             }
         }
+
 
         private void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
         {
@@ -870,7 +1349,7 @@ namespace ValleyTube
 
             double positionDifference = Math.Abs((VideoPlayer.Position - AudioPlayer.Position).TotalSeconds);
 
-            if (positionDifference > 0.5)
+            if (positionDifference > 0.25)
             {
                 AudioPlayer.Position = VideoPlayer.Position;
                 System.Diagnostics.Debug.WriteLine($"Sync correction applied. Audio Player position adjusted to {AudioPlayer.Position} to match Video Player.");
@@ -1393,4 +1872,52 @@ public class AuthorThumbnail
     public string url { get; set; }
     public int width { get; set; }
     public int height { get; set; }
+}
+
+public class InnerTubeVideoDetail
+{
+    public StreamingData StreamingData { get; set; }
+    public List<AdaptiveFormat> adaptiveFormats { get; set; }
+}
+
+public class StreamingData
+{
+    public string ExpiresInSeconds { get; set; }
+    public List<AdaptiveFormat> AdaptiveFormats { get; set; }
+}
+
+public class AdaptiveFormat
+{
+    public int itag { get; set; }
+    public string url { get; set; }
+    public string MimeType { get; set; }
+    public int Bitrate { get; set; }
+    public string Width { get; set; }
+    public string Height { get; set; }
+    public InitRange InitRange { get; set; }
+    public IndexRange IndexRange { get; set; }
+    public string LastModified { get; set; }
+    public string ContentLength { get; set; }
+    public string Quality { get; set; }
+    public int Fps { get; set; }
+    public string QualityLabel { get; set; }
+    public string ProjectionType { get; set; }
+    public int AverageBitrate { get; set; }
+    public string ApproxDurationMs { get; set; }
+    public string AudioQuality { get; set; }
+    public string AudioSampleRate { get; set; }
+    public int AudioChannels { get; set; }
+    public double LoudnessDb { get; set; }
+}
+
+public class InitRange
+{
+    public string Start { get; set; }
+    public string End { get; set; }
+}
+
+public class IndexRange
+{
+    public string Start { get; set; }
+    public string End { get; set; }
 }

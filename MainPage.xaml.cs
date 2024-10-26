@@ -18,6 +18,8 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.Phone.UI.Input;
+using System.Threading;
+using System.Linq;
 
 namespace ValleyTube
 {
@@ -26,6 +28,20 @@ namespace ValleyTube
 
         private static List<VideoResult> _videoHistory = new List<VideoResult>();
         public Windows.System.Display.DisplayRequest displayRequest = null;
+        private static readonly int MaxConcurrentRequests = 5; 
+        private static readonly Semaphore semaphore = new Semaphore(MaxConcurrentRequests, MaxConcurrentRequests);
+
+        private ObservableCollection<VideoResult> currentChannels = new ObservableCollection<VideoResult>();
+
+        private int _currentChannelIndex = 0; 
+        private const int ChannelsToLoad = 10; 
+
+        private int currentChannelSkip = 0; 
+        private const int ChannelPageSize = 10;
+
+        private bool _isLoading = false;
+
+        private bool _hasMoreResults = true;
 
         public MainPage()
         {
@@ -55,7 +71,6 @@ namespace ValleyTube
             SubbedVideosTextBox.Text = Settings.HowManySubbedVideosToFetch.ToString();
             RecommendedVideosTextBox.Text = Settings.RecommendVideoLimit.ToString();
 
-
             System.Diagnostics.Debug.WriteLine(Settings.ScreenTimeOut);
 
             InitializeDisplayRequest();
@@ -63,7 +78,6 @@ namespace ValleyTube
             SetComboBoxSelection(QualityComboBox, Settings.SelectedQuality);
 
         }
-
 
         private void SetComboBoxSelection(ComboBox comboBox, string selectedQuality)
         {
@@ -101,7 +115,6 @@ namespace ValleyTube
                 }
             }
         }
-    
 
     private async void LoadTrendingVideos()
         {
@@ -120,19 +133,52 @@ namespace ValleyTube
             await FetchData(apiUrl, GamingListView);
         }
 
-        private async void LoadSubscribedChannelsVideos()
+        private async void LoadSubscribedChannels()
         {
-            try
-            {
-                var videos = await GetSubscribedChannelsVideosAsync();
+            var subscribedChannels = await GetSubscribedChannelsVideosAsync(_currentChannelIndex, ChannelsToLoad);
+            var initialChannels = subscribedChannels.Take(ChannelsToLoad).ToList();
+            SubscriptionsListView.ItemsSource = initialChannels;
+            _currentChannelIndex += initialChannels.Count; 
+        }
 
-                SubscriptionsListView.ItemsSource = videos;
-            }
-            catch (Exception ex)
+        private async Task LoadMoreSubscribedChannels()
+        {
+            var newChannels = await GetSubscribedChannelsVideosAsync(currentChannelSkip, ChannelPageSize);
+
+            if (newChannels.Count > 0)
             {
-                System.Diagnostics.Debug.WriteLine("Failed to load subscribed channels' videos: " + ex.Message);
+                currentChannelSkip += newChannels.Count;
+
+                foreach (var channel in newChannels)
+                {
+                    currentChannels.Add(channel); 
+                }
+
+                SubscriptionsListView.ItemsSource = currentChannels;
+            }
+            else
+            {
+                var dialog = new MessageDialog("No more channels to load!");
+                await dialog.ShowAsync();
             }
         }
+
+
+        private async void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollViewer = sender as ScrollViewer;
+
+            if (scrollViewer != null)
+            {
+                // Check if the vertical offset is at the bottom of the scroll viewer
+                if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
+                {
+                    // Load more channels
+                    await LoadMoreSubscribedChannels();
+                }
+            }
+        }
+
 
         private async void LoadMusicVideos()
         {
@@ -171,7 +217,6 @@ namespace ValleyTube
                     var response = await httpClient.GetStringAsync(apiUrl);
                     var videos = JsonConvert.DeserializeObject<List<TrendingVideo>>(response);
 
-
                     listView.ItemsSource = videos;
                 }
                 catch (Exception ex)
@@ -183,58 +228,74 @@ namespace ValleyTube
 
         public static async Task<List<VideoResult>> FetchLatestVideosAsync(string authorId)
         {
-
             string apiUrl = Settings.InvidiousInstance + $"/api/v1/channels/{authorId}";
 
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
-
-                    System.Diagnostics.Debug.WriteLine("Fetching channel data from URL: " + apiUrl);
-
+                    Debug.WriteLine("Fetching channel data from URL: " + apiUrl);
                     var response = await client.GetStringAsync(apiUrl);
                     var channel = JsonConvert.DeserializeObject<Channel>(response);
 
-                    var limitedVideos = new List<VideoResult>();
-
-                    for (int i = 0; i < channel.LatestVideos.Count && i < Settings.HowManySubbedVideosToFetch; i++)
-                    {
-                        limitedVideos.Add(channel.LatestVideos[i]);
-                    }
-
+                    var limitedVideos = channel.LatestVideos.Take(Settings.HowManySubbedVideosToFetch).ToList();
                     return limitedVideos;
                 }
                 catch (Exception ex)
                 {
-
-                    System.Diagnostics.Debug.WriteLine("Error fetching channel data from URL: " + apiUrl);
-                    System.Diagnostics.Debug.WriteLine("Error message: " + ex.Message);
+                    Debug.WriteLine("Error fetching channel data from URL: " + apiUrl);
+                    Debug.WriteLine("Error message: " + ex.Message);
                     return new List<VideoResult>();
                 }
             }
         }
 
-        public static async Task<List<VideoResult>> GetSubscribedChannelsVideosAsync()
+        public static async Task<List<VideoResult>> GetSubscribedChannelsVideosAsync(int startIndex, int count)
         {
             var videos = new List<VideoResult>();
 
             if (SubscriptionManager.SubscribedAuthors == null || SubscriptionManager.SubscribedAuthors.Count == 0)
             {
-
                 var dialog = new MessageDialog("Subscribe to a channel!");
                 await dialog.ShowAsync();
-                return videos;
+                return videos; 
             }
 
-            foreach (var author in SubscriptionManager.SubscribedAuthors)
+            var authorsToFetch = SubscriptionManager.SubscribedAuthors.Skip(startIndex).Take(count).ToList();
+
+            if (!authorsToFetch.Any())
             {
-                var latestVideos = await FetchLatestVideosAsync(author);
-                videos.AddRange(latestVideos);
+                return videos; 
+            }
+
+            var fetchTasks = new List<Task<List<VideoResult>>>();
+            var semaphore = new Semaphore(5, 5); 
+
+            foreach (var author in authorsToFetch)
+            {
+                semaphore.WaitOne();
+                var fetchTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        return await FetchLatestVideosAsync(author);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
+
+                fetchTasks.Add(fetchTask);
+            }
+
+            var results = await Task.WhenAll(fetchTasks);
+            foreach (var result in results)
+            {
+                videos.AddRange(result);
             }
 
             videos.Sort(CompareVideosByPublished);
-
             return videos;
         }
 
@@ -260,56 +321,64 @@ namespace ValleyTube
             }
 
             var tasks = new List<Task>();
-
-            foreach (var video in _videoHistory)
+            int maxConcurrentRequests = 5;
+            using (var semaphore = new Semaphore(maxConcurrentRequests, maxConcurrentRequests))
             {
-                string videoId = video.VideoId;
-                string videoUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
-
-                tasks.Add(Task.Run(async () =>
+                foreach (var video in _videoHistory)
                 {
-                    try
+                    string videoId = video.VideoId;
+                    string videoUrl = Settings.InvidiousInstance + "/api/v1/videos/" + videoId;
+
+                    tasks.Add(Task.Run(async () =>
                     {
-                        using (var client = new HttpClient())
+                        semaphore.WaitOne();
+                        try
                         {
-                            var response = await client.GetStringAsync(videoUrl);
-                            var videoData = JsonConvert.DeserializeObject<VideoData>(response);
-
-                            if (videoData != null && videoData.RecommendedVideos != null)
+                            using (var client = new HttpClient())
                             {
-                                var tempRecommendedVideos = new List<VideoResult>();
+                                var response = await client.GetStringAsync(videoUrl);
+                                var videoData = JsonConvert.DeserializeObject<VideoData>(response);
 
-                                foreach (var recommendedVideo in videoData.RecommendedVideos)
+                                if (videoData != null && videoData.RecommendedVideos != null)
                                 {
-                                    if (!historyVideoChannelIds.Contains(recommendedVideo.AuthorId) &&
-                                        !addedVideoIds.Contains(recommendedVideo.VideoId) &&
-                                        tempRecommendedVideos.Count < 2)
+                                    var tempRecommendedVideos = new List<VideoResult>();
+
+                                    foreach (var recommendedVideo in videoData.RecommendedVideos)
                                     {
-                                        tempRecommendedVideos.Add(recommendedVideo);
-                                        addedVideoIds.Add(recommendedVideo.VideoId);
+                                        if (!historyVideoChannelIds.Contains(recommendedVideo.AuthorId) &&
+                                            !addedVideoIds.Contains(recommendedVideo.VideoId) &&
+                                            tempRecommendedVideos.Count < 2)
+                                        {
+                                            tempRecommendedVideos.Add(recommendedVideo);
+                                            addedVideoIds.Add(recommendedVideo.VideoId);
+                                        }
                                     }
-                                }
 
-                                lock (recommendedVideosList)
-                                {
-                                    recommendedVideosList.AddRange(tempRecommendedVideos);
-                                }
+                                    lock (recommendedVideosList)
+                                    {
+                                        recommendedVideosList.AddRange(tempRecommendedVideos);
+                                    }
 
-                                if (recommendedVideosList.Count >= Settings.RecommendVideoLimit)
-                                {
-                                    return;
+                                    if (recommendedVideosList.Count >= Settings.RecommendVideoLimit)
+                                    {
+                                        return;
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("Error fetching recommended videos from {videoUrl}: {ex.Message}");
-                    }
-                }));
-            }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error fetching recommended videos from {videoUrl}: {ex.Message}");
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }));
+                }
 
-            await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks);
+            }
 
             if (recommendedVideosList.Count > 0)
             {
@@ -327,6 +396,8 @@ namespace ValleyTube
         {
             return v2.Published.CompareTo(v1.Published);
         }
+
+
 
         private ScrollViewer GetScrollViewer(DependencyObject depObj)
         {
@@ -346,7 +417,6 @@ namespace ValleyTube
             }
             return null;
         }
-
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -386,7 +456,7 @@ namespace ValleyTube
                     LoadHistory();
                     break;
                 case "subscriptions":
-                    LoadSubscribedChannelsVideos();
+                    LoadSubscribedChannels();
                     break;
                 case "recommended":
                     LoadRecommendedVideos();
@@ -417,7 +487,7 @@ namespace ValleyTube
                 VideoId = video.VideoId,
                 Title = video.Title,
                 Author = video.Author,
-    
+
             };
 
             AddVideoToHistory(videoResult);
@@ -459,9 +529,6 @@ namespace ValleyTube
             StatusMessageTextBlock.Visibility = Visibility.Collapsed;
         }
 
-
-        // Buttons and Similar Ui Elements
-
         private void ClearSubcriptions_Click(object sender, RoutedEventArgs e)
         {
             SubscriptionManager.ClearSubscriptions();
@@ -497,7 +564,7 @@ namespace ValleyTube
             if (video != null)
             {
                 Frame.Navigate(typeof(VideoPage), video.VideoId);
-         
+
             }
 
         }
@@ -510,7 +577,7 @@ namespace ValleyTube
             if (video != null)
             {
                 Frame.Navigate(typeof(VideoPage), video.VideoId);
-            
+
             }
         }
 
@@ -614,8 +681,6 @@ namespace ValleyTube
             Settings.RedirectUri = RedirectUri.Text;
         }
 
-
-
         private void SetSubbedVideos_Click(object sender, RoutedEventArgs e)
         {
             int value;
@@ -678,7 +743,7 @@ namespace ValleyTube
 
             filePicker.PickSingleFileAndContinue();
         }
-    
+
         private void QualityComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -728,7 +793,6 @@ namespace ValleyTube
 
         }
 
-
         private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
@@ -750,13 +814,10 @@ namespace ValleyTube
 
     }
 
-
-
     public class SearchResult
     {
         public List<VideoResult> Results { get; set; }
     }
-
 
     public class VideoDetail
     {
@@ -775,11 +836,9 @@ namespace ValleyTube
         public int LengthSeconds { get; set; }
         public string authorId { get; set; }
         public string viewCount { get; set; }
-        
+
         public string genre { get; set; }
         public List<string> Keywords { get; set; } = new List<string>();
-
-
 
         public string LengthFormatted
         {
@@ -805,6 +864,57 @@ namespace ValleyTube
 
     }
 
+    public class VideoDetailsForInnerTube
+    {
+        public string videoId { get; set; }
+        public string title { get; set; }
+        public string lengthSeconds { get; set; }
+        public List<string> keywords { get; set; }
+        public string authorId { get; set; }
+        public bool isOwnerViewing { get; set; }
+        public string description { get; set; }
+        public bool isCrawlable { get; set; }
+        public StreamingData streamingData { get; set; }
+        public string viewCount { get; set; }
+        public string author { get; set; }
+        public string published { get; set; }
+        public string genre { get; set; }
+    }
+
+    public class InnerTubeVideoDetail
+    {
+        public StreamingData streamingData { get; set; }
+    }
+
+    public class StreamingData
+    {
+        public string expiresInSeconds { get; set; }
+        public List<Format> adaptiveFormats { get; set; } // Ensure this is List<Format>, not List<AdaptiveFormat>
+    }
+
+    public class Format
+    {
+        public int itag { get; set; }
+        public string url { get; set; }
+        public string mimeType { get; set; }
+        public int bitrate { get; set; }
+        public string width { get; set; }
+        public string height { get; set; }
+        public InitRange initRange { get; set; }
+        public IndexRange indexRange { get; set; }
+        public string lastModified { get; set; }
+        public string contentLength { get; set; }
+        public string quality { get; set; }
+        public int fps { get; set; }
+        public string qualityLabel { get; set; }
+        public string projectionType { get; set; }
+        public int averageBitrate { get; set; }
+        public string approxDurationMs { get; set; }
+    }
+
+
+
+
     public class NullOrEmptyToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -826,7 +936,6 @@ namespace ValleyTube
         }
     }
 
-
     public class ChannelTypeToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -845,7 +954,6 @@ namespace ValleyTube
             throw new NotImplementedException();
         }
     }
-
 
     public class ChannelTypeToVisibilityConverterOppsite : IValueConverter
     {
@@ -885,7 +993,6 @@ namespace ValleyTube
         }
     }
 
-
     public class VideoFormat
     {
         public string url { get; set; }
@@ -896,6 +1003,8 @@ namespace ValleyTube
         public string encoding { get; set; }
         public string qualityLabel { get; set; }
         public string resolution { get; set; }
+        public string height { get; set; }
+        public string width { get; set; }
     }
 
     public class VideoData
@@ -919,7 +1028,6 @@ namespace ValleyTube
         public int Height { get; set; }
     }
 
-
     public class VideoResult
     {
         public string VideoId { get; set; }
@@ -935,13 +1043,13 @@ namespace ValleyTube
 
         public Thumbnail Thumbnail { get; set; }
 
-
-        public string ThumbnailUrl
+        public string ThumbnailUrl 
         {
             get
             {
                 return $"https://img.youtube.com/vi/{VideoId}/default.jpg";
             }
+
         }
 
         public List<AuthorThumbnail> AuthorThumbnails { get; set; } = new List<AuthorThumbnail>();
@@ -953,7 +1061,6 @@ namespace ValleyTube
                 return AuthorThumbnails.Count > 0 ? AuthorThumbnails[0].Url : null;
             }
         }
-
 
         public bool IsChannel => Type == "channel";
 
@@ -1007,7 +1114,6 @@ namespace ValleyTube
 
     }
 
-
     public class Channel
     {
         public string Author { get; set; }
@@ -1031,6 +1137,5 @@ namespace ValleyTube
         public int Width { get; set; }
         public int Height { get; set; }
     }
-
 
 }

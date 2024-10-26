@@ -26,7 +26,12 @@
                                     </Grid>
                                 </Button>
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Title}"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
                                     <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
                                     <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
@@ -54,7 +59,12 @@
                                     </Grid>
                                 </Button>
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding Title}"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       TextWrapping="Wrap"
+                                       TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
                                     <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
                                     <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
@@ -190,31 +200,34 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </PivotItem>
-            
+
             <PivotItem Header="subscriptions">
-                <ListView x:Name="SubscriptionsListView" ItemClick="TrendsListView_ItemClick">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="0">
-                                <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
-                                    <Grid>
-                                        <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
-                                        <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
-                                            <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
-                                        </Border>
-                                    </Grid>
-                                </Button>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                    <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
-                                    <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                <ScrollViewer ViewChanged="ScrollViewer_ViewChanged">
+                    <ListView x:Name="SubscriptionsListView" ItemClick="TrendsListView_ItemClick">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0">
+                                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Click="ImageButton_Click2">
+                                        <Grid>
+                                            <Image Source="{Binding ThumbnailUrl}" Width="120" Height="90" Margin="0,0,10,0" Stretch="UniformToFill"/>
+                                            <Border Background="Black" Opacity="0.8" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" Padding="0">
+                                                <TextBlock Text="{Binding LengthFormatted}" Foreground="White" FontSize="14" FontWeight="Bold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Button>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="{Binding Author}" FontSize="14" Foreground="Gray"/>
+                                        <TextBlock Text="{Binding ViewCountText}" FontSize="14" Foreground="Gray"/>
+                                        <TextBlock Text="{Binding PublishedText}" FontSize="14" Foreground="Gray"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
             </PivotItem>
+
 
             <PivotItem Header="settings">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -236,6 +249,13 @@
                                     <ComboBoxItem Content="480p" Tag="480"/>
                                     <ComboBoxItem Content="720p" Tag="720"/>
                                     <ComboBoxItem Content="1080p" Tag="1080"/>
+                                    
+                                    <ComboBoxItem Content="144p Innertube" Tag="144-innertube"/>
+                                    <ComboBoxItem Content="240p Innertube" Tag="240-innertube"/>
+                                    <ComboBoxItem Content="360p Innertube" Tag="360-innertube"/>
+                                    <ComboBoxItem Content="480p Innertube" Tag="480-innertube"/>
+                                    <ComboBoxItem Content="720p Innertube" Tag="720-innertube"/>
+                                    <ComboBoxItem Content="1080p Innertube" Tag="1080-innertube"/>
                                 </ComboBox>
                             </StackPanel>
                             <TextBlock Text="Select the preferred video quality. The player will attempt to use the selected quality."
