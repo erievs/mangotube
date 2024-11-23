@@ -4,6 +4,10 @@ It is programmed like dogshit but it works.
 
 New update coming probbaly friday or thursday or this weekend! 
 
+# For A More Updated, Faster, And Better Client Use
+
+https://github.com/erievs/mangotube8.1 (for the momment not as feature complete)
+
 # Warning As Of 11/9/2024
 
 invidious is having some issues on all instances please wait for a fix
