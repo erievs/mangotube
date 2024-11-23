@@ -8,6 +8,10 @@ New update coming probbaly friday or thursday or this weekend!
 
 https://github.com/erievs/mangotube8.1 (for the momment not as feature complete)
 
+# For Windows Phone 8
+
+https://github.com/erievs/MangoTube8
+
 # Warning As Of 11/9/2024
 
 invidious is having some issues on all instances please wait for a fix
